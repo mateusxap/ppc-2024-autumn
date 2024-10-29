@@ -44,28 +44,27 @@ bool CountSentencesSequential::post_processing() {
 
 bool CountSentencesParallel::pre_processing() {
   internal_order_test();
-  // Переменные для деления текста
-  int text_length = 0;
   int base_part_size = 0;
   int remainder = 0;
-  std::vector<std::string> text_parts(world.size());  // Вектор для подстрок текста
+  int text_length = 0;
+  std::string full_text;
+    
   if (world.rank() == 0) {
-    // Только процесс с рангом 0 инициализирует текст и делит его на части
-    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-    text_length = text.size();
+    full_text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
+    text_length = full_text.size();
     base_part_size = text_length / world.size();
     remainder = text_length % world.size();
-    // Разделяем текст на подстроки для каждого процесса
-    int start = 0;
-    for (int i = 0; i < world.size(); i++) {
-      int end = start + base_part_size + (i < remainder ? 1 : 0);
-      text_parts[i] = text.substr(start, end - start);
-      start = end;
-    }
   }
-  // Используем scatter для распределения частей текста
-  boost::mpi::scatter(world, text_parts, local_text, 0);
-  // Инициализируем счетчик предложений
+
+  boost::mpi::broadcast(world, full_text, 0);
+  boost::mpi::broadcast(world, base_part_size, 0);
+  boost::mpi::broadcast(world, remainder, 0);
+
+  int start = world.rank() * base_part_size + std::min(world.rank(), remainder);
+  int end = start + base_part_size + (world.rank() < remainder ? 1 : 0);
+
+  // Теперь используем разосланный текст
+  local_text = full_text.substr(start, end - start);
   sentence_count = 0;
   return true;
 }
