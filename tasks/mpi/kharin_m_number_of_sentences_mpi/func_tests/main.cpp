@@ -55,10 +55,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Empty_Text) {
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    input_text = "";
-  }
-
   // Рассылаем input_text всем процессам
   boost::mpi::broadcast(world, input_text, 0);
 
@@ -103,7 +99,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Long_Text) {
 
   if (world.rank() == 0) {
     // Create a long text with 100 sentences
-    input_text = "";
     for (int i = 0; i < 100; i++) {
       input_text += "This is sentence number " + std::to_string(i + 1) + ". ";
     }

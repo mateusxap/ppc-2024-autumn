@@ -81,7 +81,7 @@ bool CountSentencesParallel::run() {
   // Подсчет предложений в локальной части текста
   int local_count = CountSentences(local_text);
   // Суммирование результатов
-  boost::mpi::reduce(world, local_count, sentence_count, std::plus<int>(), 0);
+  boost::mpi::reduce(world, local_count, sentence_count, std::plus<>(), 0); 
   return true;
 }
 

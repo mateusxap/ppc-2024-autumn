@@ -23,7 +23,7 @@ TEST(Sequential_Sentences_Count, Test_Simple_Sentences) {
 }
 
 TEST(Sequential_Sentences_Count, Test_Empty_Text) {
-  std::string input_text = "";
+  std::string input_text;
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
@@ -41,7 +41,7 @@ TEST(Sequential_Sentences_Count, Test_Empty_Text) {
 }
 
 TEST(Sequential_Sentences_Count, Test_Long_Text) {
-  std::string input_text = "";
+  std::string input_text;
   std::vector<int> sentence_count(1, 0);
 
   for (int i = 0; i < 100; i++) {
