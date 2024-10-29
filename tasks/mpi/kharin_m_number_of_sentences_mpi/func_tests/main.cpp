@@ -47,9 +47,9 @@ TEST(Parallel_Sentences_Count_MPI, Test_Simple_Sentences) {
     ASSERT_EQ(reference_count[0], 4);
     ASSERT_EQ(reference_count[0], sentence_count[0]);
   }
-  }
+}
 
-  TEST(Parallel_Sentences_Count_MPI, Test_Empty_Text) {
+TEST(Parallel_Sentences_Count_MPI, Test_Empty_Text) {
   boost::mpi::communicator world;
   std::string input_text;
   std::vector<int> sentence_count(1, 0);
@@ -94,7 +94,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Simple_Sentences) {
     ASSERT_EQ(reference_count[0], sentence_count[0]);
   }
 }
-
 
 TEST(Parallel_Sentences_Count_MPI, Test_Long_Text) {
   boost::mpi::communicator world;
@@ -143,8 +142,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Long_Text) {
   }
 }
 
-
-
 TEST(Parallel_Sentences_Count_MPI, Test_Sentences_with_other_symbols) {
   boost::mpi::communicator world;
   std::string input_text;
@@ -152,7 +149,8 @@ TEST(Parallel_Sentences_Count_MPI, Test_Sentences_with_other_symbols) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    input_text = "Hi! What's you're name? My name is Matthew. How are you? I'm fine, thank you. And you? I'm also fine.";
+    input_text =
+        "Hi! What's you're name? My name is Matthew. How are you? I'm fine, thank you. And you? I'm also fine.";
   }
 
   // Рассылаем input_text всем процессам
@@ -172,8 +170,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Sentences_with_other_symbols) {
 
   if (world.rank() == 0) {
     std::vector<int> reference_count(1, 0);
-    
-    
     std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
     taskDataSeq->inputs_count.emplace_back(input_text.size());
@@ -192,4 +188,3 @@ TEST(Parallel_Sentences_Count_MPI, Test_Sentences_with_other_symbols) {
     ASSERT_EQ(reference_count[0], sentence_count[0]);
   }
 }
-

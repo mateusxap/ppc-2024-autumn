@@ -21,7 +21,4 @@ class CountSentencesSequential : public ppc::core::Task {
   std::string text;
   int sentence_count{};
 };
-
-
-
 }  // namespace kharin_m_number_of_sentences_seq

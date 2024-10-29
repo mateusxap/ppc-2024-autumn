@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
@@ -29,7 +29,7 @@ TEST(seq_kharin_m_sentence_count_perf_test, test_pipeline_run) {
   perfAttr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
-    return static_cast<double>(duration) * 1e-9; // Конвертируем в секунды
+    return static_cast<double>(duration) * 1e-9;  // Конвертируем в секунды
   };
 
   // Create and init perf results
@@ -47,7 +47,6 @@ TEST(seq_kharin_m_sentence_count_perf_test, test_pipeline_run) {
 TEST(seq_kharin_m_sentence_count_perf_test, test_task_run) {
   std::string input_text;
   std::vector<int> sentence_count(1, 0);
-
 
   input_text = "This is a long text with many sentences. ";
   for (int i = 0; i < 10000000; i++) {
@@ -68,7 +67,7 @@ TEST(seq_kharin_m_sentence_count_perf_test, test_task_run) {
   perfAttr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(current_time_point - t0).count();
-    return static_cast<double>(duration) * 1e-9; // Конвертируем в секунды
+    return static_cast<double>(duration) * 1e-9;  // Конвертируем в секунды
   };
 
   // Create and init perf results
@@ -78,7 +77,6 @@ TEST(seq_kharin_m_sentence_count_perf_test, test_task_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testSeqTask);
 
   perfAnalyzer->task_run(perfAttr, perfResults);
-
 
   ppc::core::Perf::print_perf_statistic(perfResults);
   ASSERT_EQ(10000001, sentence_count[0]);

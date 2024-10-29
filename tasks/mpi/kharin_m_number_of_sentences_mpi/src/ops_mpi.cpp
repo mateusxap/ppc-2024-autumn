@@ -1,10 +1,9 @@
+#include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
+
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
-
-#include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
-
 
 namespace kharin_m_number_of_sentences_mpi {
 
@@ -18,7 +17,6 @@ int CountSentences(const std::string& text) {
   }
   return count;
 }
-
 
 bool CountSentencesSequential::pre_processing() {
   internal_order_test();
@@ -50,10 +48,10 @@ bool CountSentencesParallel::pre_processing() {
   int remainder = 0;
   int text_length = 0;
   if (world.rank() == 0) {
-  text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-  text_length = text.size();
-  base_part_size = text_length / world.size();
-  remainder = text_length % world.size();
+    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
+    text_length = text.size();
+    base_part_size = text_length / world.size();
+    remainder = text_length % world.size();
   }
 
   boost::mpi::broadcast(world, base_part_size, 0);
@@ -66,9 +64,7 @@ bool CountSentencesParallel::pre_processing() {
   // Каждый процесс создает свою local_text
   int delta = end - start;
   local_text = std::string(delta, ' ');
-  std::copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start,
-      reinterpret_cast<const char*>(taskData->inputs[0]) + end,
-      local_text.begin());
+  std::copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start, reinterpret_cast<const char*>(taskData->inputs[0]) + end, local_text.begin());
 
   sentence_count = 0;
   return true;
@@ -83,7 +79,6 @@ bool CountSentencesParallel::run() {
   internal_order_test();
   // Подсчет предложений в локальной части текста
   int local_count = CountSentences(local_text);
-  
   // Суммирование результатов
   boost::mpi::reduce(world, local_count, sentence_count, std::plus<int>(), 0);
   return true;
@@ -92,9 +87,9 @@ bool CountSentencesParallel::run() {
 bool CountSentencesParallel::post_processing() {
   internal_order_test();
   if (world.rank() == 0) {
-  reinterpret_cast<int*>(taskData->outputs[0])[0] = sentence_count;
+    reinterpret_cast<int*>(taskData->outputs[0])[0] = sentence_count;
   }
   return true;
 }
 
-} // namespace kharin_m_number_of_sentences_mpi
+}  // namespace kharin_m_number_of_sentences_mpi

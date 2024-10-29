@@ -1,7 +1,7 @@
+#include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
+
 #include <algorithm>
 #include <string>
-
-#include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
 
 namespace kharin_m_number_of_sentences_seq {
 
@@ -15,7 +15,6 @@ int CountSentences(const std::string& text) {
   }
   return count;
 }
-
 
 bool CountSentencesSequential::pre_processing() {
   internal_order_test();
@@ -41,5 +40,4 @@ bool CountSentencesSequential::post_processing() {
   return true;
 }
 
-
-} // namespace kharin_m_number_of_sentences_seq
+}  // namespace kharin_m_number_of_sentences_seq
