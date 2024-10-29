@@ -14,15 +14,10 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_pipeline_run) {
 
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    // Создаем длинный текст с большим количеством предложений
-    input_text = "This is a long text with many sentences. ";
-    for (int i = 0; i < 10000000; i++) {
-      input_text += "Sentence " + std::to_string(i + 1) + ". ";
-    }
+  input_text = "This is a long text with many sentences. ";
+  for (int i = 0; i < 10000000; i++) {
+    input_text += "Sentence " + std::to_string(i + 1) + ". ";
   }
-
-  boost::mpi::broadcast(world, input_text, 0);
 
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
   taskDataPar->inputs_count.emplace_back(input_text.size());
@@ -62,16 +57,10 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_task_run) {
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    // Создаем длинный текст с большим количеством предложений
-    input_text = "This is a long text with many sentences. ";
-    for (int i = 0; i < 10000000; i++) {
-      input_text += "Sentence " + std::to_string(i + 1) + ". ";
-    }
+  input_text = "This is a long text with many sentences. ";
+  for (int i = 0; i < 10000000; i++) {
+    input_text += "Sentence " + std::to_string(i + 1) + ". ";
   }
-
-  // Рассылаем input_text всем процессам
-  boost::mpi::broadcast(world, input_text, 0);
 
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
   taskDataPar->inputs_count.emplace_back(input_text.size());

@@ -5,17 +5,6 @@
 
 namespace kharin_m_number_of_sentences_seq {
 
-int CountSentences(const std::string& text) {
-  int count = 0;
-  for (size_t i = 0; i < text.size(); i++) {
-    char c = text[i];
-    if (c == '.' || c == '?' || c == '!') {
-      count++;
-    }
-  }
-  return count;
-}
-
 bool CountSentencesSequential::pre_processing() {
   internal_order_test();
   text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
@@ -30,7 +19,12 @@ bool CountSentencesSequential::validation() {
 
 bool CountSentencesSequential::run() {
   internal_order_test();
-  sentence_count = CountSentences(text);
+  for (size_t i = 0; i < text.size(); i++) {
+    char c = text[i];
+    if (c == '.' || c == '?' || c == '!') {
+      sentence_count++;
+    }
+  }
   return true;
 }
 
