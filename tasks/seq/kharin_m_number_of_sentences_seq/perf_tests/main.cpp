@@ -39,7 +39,6 @@ TEST(seq_kharin_m_sentence_count_perf_test, test_pipeline_run) {
   auto perfAnalyzer = std::make_shared<ppc::core::Perf>(testSeqTask);
 
   perfAnalyzer->pipeline_run(perfAttr, perfResults);
-   
   ppc::core::Perf::print_perf_statistic(perfResults);
   ASSERT_EQ(10000001, sentence_count[0]);
 }

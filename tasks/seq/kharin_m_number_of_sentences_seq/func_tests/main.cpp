@@ -53,19 +53,15 @@ TEST(Sequential_Sentences_Count, Test_Long_Text) {
   taskDataSeq->inputs_count.emplace_back(input_text.size());
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(sentence_count.data()));
   taskDataSeq->outputs_count.emplace_back(sentence_count.size());
-  
   // Run sequential version
   kharin_m_number_of_sentences_seq::CountSentencesSequential countSentencesSequential(taskDataSeq);
   ASSERT_EQ(countSentencesSequential.validation(), true);
   countSentencesSequential.pre_processing();
   countSentencesSequential.run();
   countSentencesSequential.post_processing();
-  
   // Compare results
   ASSERT_EQ(sentence_count[0], 100);
 }
-
-
 
 TEST(Sequential_Sentences_Count, Test_Sentences_with_other_symbols) {
   std::string input_text =
@@ -85,5 +81,3 @@ TEST(Sequential_Sentences_Count, Test_Sentences_with_other_symbols) {
   // Compare results
   ASSERT_EQ(sentence_count[0], 7);
 }
-
-
