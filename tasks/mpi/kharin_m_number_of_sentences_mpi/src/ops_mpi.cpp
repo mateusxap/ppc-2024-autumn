@@ -65,7 +65,7 @@ bool CountSentencesParallel::pre_processing() {
   int delta = end - start;
   local_text = std::string(delta, ' ');
   copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start,
-            reinterpret_cast<const char*>(taskData->inputs[0]) + end, local_text.begin());
+       reinterpret_cast<const char*>(taskData->inputs[0]) + end, local_text.begin());
 
   sentence_count = 0;
   return true;
