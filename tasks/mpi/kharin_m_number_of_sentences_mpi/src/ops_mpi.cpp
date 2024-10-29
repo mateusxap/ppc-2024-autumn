@@ -1,21 +1,22 @@
-#include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
-
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
 
+#include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
+
+
 namespace kharin_m_number_of_sentences_mpi {
 
 int CountSentences(const std::string& text) {
-    int count = 0;
-    for (size_t i = 0; i < text.size(); i++) {
-        char c = text[i];
-        if (c == '.' || c == '?' || c == '!') {
-            count++;
-        }
+  int count = 0;
+  for (size_t i = 0; i < text.size(); i++) {
+    char c = text[i];
+    if (c == '.' || c == '?' || c == '!') {
+      count++;
     }
-    return count;
+  }
+  return count;
 }
 
 
@@ -49,10 +50,10 @@ bool CountSentencesParallel::pre_processing() {
   int remainder = 0;
   int text_length = 0;
   if (world.rank() == 0) {
-    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-    text_length = text.size();
-    base_part_size = text_length / world.size();
-    remainder = text_length % world.size();
+  text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
+  text_length = text.size();
+  base_part_size = text_length / world.size();
+  remainder = text_length % world.size();
   }
 
   boost::mpi::broadcast(world, base_part_size, 0);
@@ -66,8 +67,8 @@ bool CountSentencesParallel::pre_processing() {
   int delta = end - start;
   local_text = std::string(delta, ' ');
   std::copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start,
-            reinterpret_cast<const char*>(taskData->inputs[0]) + end,
-            local_text.begin());
+      reinterpret_cast<const char*>(taskData->inputs[0]) + end,
+      local_text.begin());
 
   sentence_count = 0;
   return true;
@@ -91,7 +92,7 @@ bool CountSentencesParallel::run() {
 bool CountSentencesParallel::post_processing() {
   internal_order_test();
   if (world.rank() == 0) {
-    reinterpret_cast<int*>(taskData->outputs[0])[0] = sentence_count;
+  reinterpret_cast<int*>(taskData->outputs[0])[0] = sentence_count;
   }
   return true;
 }

@@ -1,19 +1,19 @@
-#include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
-
 #include <algorithm>
 #include <string>
+
+#include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
 
 namespace kharin_m_number_of_sentences_seq {
 
 int CountSentences(const std::string& text) {
-    int count = 0;
-    for (size_t i = 0; i < text.size(); i++) {
-        char c = text[i];
-        if (c == '.' || c == '?' || c == '!') {
-            count++;
-        }
+  int count = 0;
+  for (size_t i = 0; i < text.size(); i++) {
+    char c = text[i];
+    if (c == '.' || c == '?' || c == '!') {
+      count++;
     }
-    return count;
+  }
+  return count;
 }
 
 

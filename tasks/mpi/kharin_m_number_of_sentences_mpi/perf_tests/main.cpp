@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
+
 #include <boost/mpi/timer.hpp>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
@@ -14,11 +15,11 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_pipeline_run) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    // Создаем длинный текст с большим количеством предложений
-    input_text = "This is a long text with many sentences. ";
-    for (int i = 0; i < 10000000; i++) {
-      input_text += "Sentence " + std::to_string(i + 1) + ". ";
-    }
+  // Создаем длинный текст с большим количеством предложений
+  input_text = "This is a long text with many sentences. ";
+  for (int i = 0; i < 10000000; i++) {
+    input_text += "Sentence " + std::to_string(i + 1) + ". ";
+  }
   }
 
   boost::mpi::broadcast(world, input_text, 0);
@@ -50,9 +51,9 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_pipeline_run) {
   perfAnalyzer->pipeline_run(perfAttr, perfResults);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
-    // Проверяем результат (должно быть 10000001 предложение)
-    ASSERT_EQ(10000001, sentence_count[0]);
+  ppc::core::Perf::print_perf_statistic(perfResults);
+  // Проверяем результат (должно быть 10000001 предложение)
+  ASSERT_EQ(10000001, sentence_count[0]);
   }
 }
 
@@ -63,11 +64,11 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_task_run) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   if (world.rank() == 0) {
-    // Создаем длинный текст с большим количеством предложений
-    input_text = "This is a long text with many sentences. ";
-    for (int i = 0; i < 10000000; i++) {
-      input_text += "Sentence " + std::to_string(i + 1) + ". ";
-    }
+  // Создаем длинный текст с большим количеством предложений
+  input_text = "This is a long text with many sentences. ";
+  for (int i = 0; i < 10000000; i++) {
+    input_text += "Sentence " + std::to_string(i + 1) + ". ";
+  }
   }
 
   // Рассылаем input_text всем процессам
@@ -100,8 +101,8 @@ TEST(mpi_kharin_m_sentence_count_perf_test, test_task_run) {
   perfAnalyzer->task_run(perfAttr, perfResults);
 
   if (world.rank() == 0) {
-    ppc::core::Perf::print_perf_statistic(perfResults);
-    // Проверяем результат (должно быть 10000001 предложение)
-    ASSERT_EQ(10000001, sentence_count[0]);
+  ppc::core::Perf::print_perf_statistic(perfResults);
+  // Проверяем результат (должно быть 10000001 предложение)
+  ASSERT_EQ(10000001, sentence_count[0]);
   }
 }

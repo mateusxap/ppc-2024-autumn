@@ -1,19 +1,19 @@
 #pragma once
 
 #include <gtest/gtest.h>
+
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/collectives.hpp>
 #include <memory>
 #include <string> 
-#include "core/task/include/task.hpp"
 
+#include "core/task/include/task.hpp"
 
 namespace kharin_m_number_of_sentences_mpi {
 
 class CountSentencesParallel : public ppc::core::Task {
  public:
-  explicit CountSentencesParallel(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
+  explicit CountSentencesParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
   bool pre_processing() override;
   bool validation() override;
   bool run() override;
@@ -25,11 +25,9 @@ class CountSentencesParallel : public ppc::core::Task {
   boost::mpi::communicator world;
 };
 
-
 class CountSentencesSequential : public ppc::core::Task {
  public:
-  explicit CountSentencesSequential(std::shared_ptr<ppc::core::TaskData> taskData_)
-      : Task(std::move(taskData_)) {}
+  explicit CountSentencesSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
   bool pre_processing() override;
   bool validation() override;
   bool run() override;
@@ -39,7 +37,5 @@ class CountSentencesSequential : public ppc::core::Task {
   std::string text;
   int sentence_count{};
 };
-
-
 
 }  // namespace kharin_m_number_of_sentences_mpi
