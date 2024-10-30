@@ -74,8 +74,8 @@ bool CountSentencesParallel::run() {
   internal_order_test();
   // Подсчет предложений в локальной части текста
   int local_count = 0;
-  for (size_t i = 0; i < text.size(); i++) {
-    char c = text[i];
+  for (size_t i = 0; i < local_text.size(); i++) {
+    char c = local_text[i];
     if (c == '.' || c == '?' || c == '!') {
       local_count++;
     }
