@@ -7,6 +7,17 @@
 
 namespace kharin_m_number_of_sentences_mpi {
 
+int CountSentences(const std::string& text) {
+  int count = 0;
+  for (size_t i = 0; i < text.size(); i++) {
+    char c = text[i];
+    if (c == '.' || c == '?' || c == '!') {
+      count++;
+    }
+  }
+  return count;
+}
+
 bool CountSentencesSequential::pre_processing() {
   internal_order_test();
   text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
@@ -21,13 +32,7 @@ bool CountSentencesSequential::validation() {
 
 bool CountSentencesSequential::run() {
   internal_order_test();
-  int sentence_count = 0;
-  for (size_t i = 0; i < text.size(); i++) {
-    char c = text[i];
-    if (c == '.' || c == '?' || c == '!') {
-      sentence_count++;
-    }
-  }
+  sentence_count = CountSentences(text);
   return true;
 }
 
@@ -74,13 +79,7 @@ bool CountSentencesParallel::validation() {
 bool CountSentencesParallel::run() {
   internal_order_test();
   // Подсчет предложений в локальной части текста
-  int local_count = 0;
-  for (size_t i = 0; i < text.size(); i++) {
-    char c = text[i];
-    if (c == '.' || c == '?' || c == '!') {
-      local_count++;
-    }
-  }
+  int local_count = CountSentences(local_text);
   // Суммирование результатов
   boost::mpi::reduce(world, local_count, sentence_count, std::plus<>(), 0);
   return true;
