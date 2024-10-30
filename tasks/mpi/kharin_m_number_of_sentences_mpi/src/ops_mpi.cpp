@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/vector.hpp>
 #include <string>
 
 namespace kharin_m_number_of_sentences_mpi {
@@ -49,20 +47,26 @@ bool CountSentencesParallel::pre_processing() {
   int base_part_size = 0;
   int remainder = 0;
   int text_length = 0;
-  std::string full_text;  
   if (world.rank() == 0) {
-    full_text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
-    text_length = full_text.size();
+    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
+    text_length = text.size();
     base_part_size = text_length / world.size();
     remainder = text_length % world.size();
   }
-  boost::mpi::broadcast(world, full_text, 0);
+
   boost::mpi::broadcast(world, base_part_size, 0);
   boost::mpi::broadcast(world, remainder, 0);
+
+  // Вычисляем начальную и конечную позиции для каждого процесса
   int start = world.rank() * base_part_size + std::min(world.rank(), remainder);
   int end = start + base_part_size + (world.rank() < remainder ? 1 : 0);
-  // Теперь используем разосланный текст
-  local_text = full_text.substr(start, end - start);
+
+  // Каждый процесс создает свою local_text
+  int delta = end - start;
+  local_text = std::string(delta, ' ');
+  copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start,
+       reinterpret_cast<const char*>(taskData->inputs[0]) + end, local_text.begin());
+
   sentence_count = 0;
   return true;
 }

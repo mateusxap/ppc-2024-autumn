@@ -11,11 +11,7 @@ TEST(Parallel_Sentences_Count_MPI, Test_Simple_Sentences) {
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    input_text = "This is sentence one. This is sentence two! Is this sentence three? This is sentence four.";
-  }
-
-  boost::mpi::broadcast(world, input_text, 0);
+  input_text = "This is sentence one. This is sentence two! Is this sentence three? This is sentence four.";
 
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
   taskDataPar->inputs_count.emplace_back(input_text.size());
@@ -54,9 +50,6 @@ TEST(Parallel_Sentences_Count_MPI, Test_Empty_Text) {
   std::string input_text;
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-
-  // Рассылаем input_text всем процессам
-  boost::mpi::broadcast(world, input_text, 0);
 
   // Все процессы заполняют taskDataPar
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
@@ -97,14 +90,10 @@ TEST(Parallel_Sentences_Count_MPI, Test_Long_Text) {
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    // Create a long text with 100 sentences
-    for (int i = 0; i < 100; i++) {
-      input_text += "This is sentence number " + std::to_string(i + 1) + ". ";
-    }
+
+  for (int i = 0; i < 100; i++) {
+    input_text += "This is sentence number " + std::to_string(i + 1) + ". ";
   }
-  // Рассылаем input_text всем процессам
-  boost::mpi::broadcast(world, input_text, 0);
 
   // Все процессы заполняют taskDataPar
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
@@ -143,13 +132,7 @@ TEST(Parallel_Sentences_Count_MPI, Test_Sentences_with_other_symbols) {
   std::vector<int> sentence_count(1, 0);
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
-  if (world.rank() == 0) {
-    input_text =
-        "Hi! What's you're name? My name is Matthew. How are you? I'm fine, thank you. And you? I'm also fine.";
-  }
-
-  // Рассылаем input_text всем процессам
-  boost::mpi::broadcast(world, input_text, 0);
+  input_text = "Hi! What's you're name? My name is Matthew. How are you? I'm fine, thank you. And you? I'm also fine.";
 
   // Все процессы заполняют taskDataPar
   taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(const_cast<char*>(input_text.c_str())));
