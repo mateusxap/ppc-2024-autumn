@@ -38,11 +38,24 @@ bool CountSentencesSequential::post_processing() {
 
 bool CountSentencesParallel::pre_processing() {
   internal_order_test();
+  if (world.rank() == 0) {
+    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
+  }
+  sentence_count = 0;
+  return true;
+}
+
+bool CountSentencesParallel::validation() {
+  internal_order_test();
+  return world.rank() == 0 ? taskData->outputs_count[0] == 1 : true;
+}
+
+bool CountSentencesParallel::run() {
+  internal_order_test();
   int base_part_size = 0;
   int remainder = 0;
   int text_length = 0;
   if (world.rank() == 0) {
-    text = std::string(reinterpret_cast<const char*>(taskData->inputs[0]), taskData->inputs_count[0]);
     text_length = text.size();
     base_part_size = text_length / world.size();
     remainder = text_length % world.size();
@@ -61,18 +74,7 @@ bool CountSentencesParallel::pre_processing() {
   copy(reinterpret_cast<const char*>(taskData->inputs[0]) + start,
        reinterpret_cast<const char*>(taskData->inputs[0]) + end, local_text.begin());
 
-  sentence_count = 0;
-  return true;
-}
-
-bool CountSentencesParallel::validation() {
-  internal_order_test();
-  return world.rank() == 0 ? taskData->outputs_count[0] == 1 : true;
-}
-
-bool CountSentencesParallel::run() {
-  internal_order_test();
-  // Подсчет предложений в локальной части текста
+  // Подсчет предложений в локальной части
   int local_count = 0;
   for (size_t i = 0; i < local_text.size(); i++) {
     char c = local_text[i];
@@ -80,6 +82,7 @@ bool CountSentencesParallel::run() {
       local_count++;
     }
   }
+
   // Суммирование результатов
   boost::mpi::reduce(world, local_count, sentence_count, std::plus<>(), 0);
   return true;
