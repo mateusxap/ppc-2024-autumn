@@ -191,7 +191,7 @@ TEST(Parallel_Sentences_Count_MPI, Test_Random_Text) {
 
   boost::mpi::broadcast(world, text_length, 0);
   if (world.rank() != 0) {
-    c_input_text = new char[text_length + 1]; // Выделение памяти для других процессов
+    c_input_text = new char[text_length + 1];  // Выделение памяти для других процессов
   }
   boost::mpi::broadcast(world, c_input_text, text_length + 1, 0);
 
@@ -224,5 +224,5 @@ TEST(Parallel_Sentences_Count_MPI, Test_Random_Text) {
 
     ASSERT_EQ(reference_count[0], sentence_count[0]);
   }
-  delete[] c_input_text; // Очистка динамической памяти
+  delete[] c_input_text;  // Очистка динамической памяти
 }
