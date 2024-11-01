@@ -1,6 +1,5 @@
 #include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
 
-#include <algorithm>
 #include <string>
 
 namespace kharin_m_number_of_sentences_seq {

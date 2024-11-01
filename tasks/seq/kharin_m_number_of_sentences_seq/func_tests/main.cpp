@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
-
 #include "seq/kharin_m_number_of_sentences_seq/include/ops_seq.hpp"
 
 TEST(Sequential_Sentences_Count, Test_Simple_Sentences) {

@@ -1,6 +1,5 @@
 #include "mpi/kharin_m_number_of_sentences_mpi/include/ops_mpi.hpp"
 
-#include <algorithm>
 #include <boost/mpi/collectives.hpp>
 #include <boost/mpi/communicator.hpp>
 #include <string>
