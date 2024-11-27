@@ -15,7 +15,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
   mpi::environment env;
   mpi::communicator world;
 
-  int N = 1000;       // Размер большой матрицы для теста производительности
+  int N = 1000;  // Размер большой матрицы для теста производительности
   double eps = 1e-6;  // Точность вычислений
 
   // Генерируем большую диагонально доминантную матрицу
@@ -97,7 +97,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
   mpi::environment env;
   mpi::communicator world;
 
-  int N = 1000;       // Размер большой матрицы для теста производительности
+  int N = 1000;  // Размер большой матрицы для теста производительности
   double eps = 1e-6;  // Точность вычислений
 
   // Генерируем большую диагонально доминантную матрицу
@@ -153,7 +153,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
 
   // Создаем атрибуты для тестирования производительности
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
-  perfAttr->num_running = 5; // Количество запусков для усреднения
+  perfAttr->num_running = 5;  // Количество запусков для усреднения
   const mpi::timer current_timer;
   perfAttr->current_timer = [&] { return current_timer.elapsed(); };
 
