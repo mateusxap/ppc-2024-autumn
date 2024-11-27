@@ -92,7 +92,7 @@ TEST(GaussSeidel_MPI, SimpleData) {
 
     // Сравниваем результаты
     for (size_t i = 0; i < sizePar; ++i) {
-    ASSERT_NEAR(resultPar[i], resultSeq[i], 1e-6);
+      ASSERT_NEAR(resultPar[i], resultSeq[i], 1e-6);
     }
   }
 
