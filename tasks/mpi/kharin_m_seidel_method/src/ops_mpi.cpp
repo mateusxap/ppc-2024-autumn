@@ -54,15 +54,15 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   }
 
   // Проверка размеров входных данных
-  if (taskData->inputs_count[0] != static_cast<size_t>(1) ||      // n
-      taskData->inputs_count[1] != static_cast<size_t>(1) ||      // eps
-      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||  // Матрица A
-      taskData->inputs_count[3] != static_cast<size_t>(n) ||      // Вектор b
-      taskData->outputs_count[0] != static_cast<size_t>(n)) {     // Вектор x
+  else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||  // n
+      taskData->inputs_count[1] != static_cast<size_t>(1) ||       // eps
+      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||   // Матрица A
+      taskData->inputs_count[3] != static_cast<size_t>(n) ||       // Вектор b
+      taskData->outputs_count[0] != static_cast<size_t>(n)) {      // Вектор x
     return false;
   }
 
-  // Добавление проверки условия сходимости
+  // Проверка условия сходимости
   double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
   for (int i = 0; i < n; ++i) {
     double diag = std::abs(a_data[i * n + i]);
@@ -211,35 +211,35 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
   if (world.rank() == 0) {
     n = *(reinterpret_cast<int*>(taskData->inputs[0]));
   
-  // Проверка количества входных и выходных данных
-  if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
-    is_valid = false;
-  }
-
-  // Проверка размеров входных данных
-  if (taskData->inputs_count[0] != static_cast<size_t>(1) ||       // n
-      taskData->inputs_count[1] != static_cast<size_t>(1) ||       // eps
-      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||   // Матрица A
-      taskData->inputs_count[3] != static_cast<size_t>(n) ||       // Вектор b
-      taskData->outputs_count[0] != static_cast<size_t>(n)) {      // Вектор x
-    is_valid = false;
-  }
-
-  // Добавление проверки условия сходимости
-  double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-  for (int i = 0; i < n; ++i) {
-    double diag = std::abs(a_data[i * n + i]);
-    double sum = 0.0;
-    for (int j = 0; j < n; ++j) {
-      if (j != i) {
-        sum += std::abs(a_data[i * n + j]);
-      }
-    }
-    if (diag <= sum) {
-      std::cerr << "Матрица A не является строго диагонально доминантной в строке " << i << ".\n";
+    // Проверка количества входных и выходных данных
+    if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
       is_valid = false;
     }
-  }
+
+    // Проверка размеров входных данных
+    else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||  // n
+        taskData->inputs_count[1] != static_cast<size_t>(1) ||       // eps
+        taskData->inputs_count[2] != static_cast<size_t>(n * n) ||   // Матрица A
+        taskData->inputs_count[3] != static_cast<size_t>(n) ||       // Вектор b
+        taskData->outputs_count[0] != static_cast<size_t>(n)) {      // Вектор x
+      is_valid = false;
+    }
+
+    // Проверка условия сходимости
+    double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+    for (int i = 0; i < n; ++i) {
+      double diag = std::abs(a_data[i * n + i]);
+      double sum = 0.0;
+      for (int j = 0; j < n; ++j) {
+        if (j != i) {
+          sum += std::abs(a_data[i * n + j]);
+        }
+      }
+      if (diag <= sum) {
+        std::cerr << "Матрица A не является строго диагонально доминантной в строке " << i << ".\n";
+        is_valid = false;
+      }
+    }
   }
 
   // Распространение результата проверки
