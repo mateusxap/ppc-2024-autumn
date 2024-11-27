@@ -13,88 +13,94 @@
 namespace mpi = boost::mpi;
 using namespace kharin_m_seidel_method;
 
-// Тест 0: Простые данные
-TEST(GaussSeidel_MPI, SimpleData) {
-  mpi::environment env;
-  mpi::communicator world;
+    // Тест 0: Простые данные
+    TEST(GaussSeidel_MPI, SimpleData) {
+    mpi::environment env;
+    mpi::communicator world;
 
-  // Создаем TaskData для параллельной и последовательной версий
-  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+    // Создаем TaskData для параллельной и последовательной версий
+    std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+    std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
-  int N = 4;          // Размер матрицы
-  double eps = 1e-6;  // Точность вычислений
+    int N = 4;          // Размер матрицы
+    double eps = 1e-6;  // Точность вычислений
 
-  // Матрица A и вектор b (пример системы уравнений)
-  std::vector<double> A = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-  std::vector<double> b = {15, 15, 10, 10};
+    // Матрица A и вектор b (пример системы уравнений)
+    std::vector<double> A = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+    std::vector<double> b = {15, 15, 10, 10};
 
-  // Выделяем память для выходных данных
-  double* xPar = new double[N];
-  double* xSeq = new double[N];
+    // Выделяем память для выходных данных
+    double* xPar = new double[N];
+    double* xSeq = new double[N];
 
-  // Инициализируем входные данные и результаты на процессе 0
-  if (world.rank() == 0) {
-    // Входные данные для параллельной задачи
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
-    taskDataPar->inputs_count.emplace_back(1);  // Количество элементов типа int
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&eps));
-    taskDataPar->inputs_count.emplace_back(1);  // Количество элементов типа double
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataPar->inputs_count.emplace_back(N * N);  // Матрица A размером N x N
-
-    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
-    taskDataPar->inputs_count.emplace_back(N);  // Вектор b размером N
-
-    // Выходные данные для параллельной задачи
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
-    taskDataPar->outputs_count.emplace_back(N);  // Вектор решений x размером N
-
-    // Входные данные для последовательной задачи (идентичны параллельной)
-    taskDataSeq->inputs = taskDataPar->inputs;
-    taskDataSeq->inputs_count = taskDataPar->inputs_count;
-
-    // Выходные данные для последовательной задачи
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
-    taskDataSeq->outputs_count.emplace_back(N);
-  }
-
-  // Создаем и запускаем параллельную задачу
-  GaussSeidelParallel gaussSeidelPar(taskDataPar);
-  ASSERT_TRUE(gaussSeidelPar.validation());
-  gaussSeidelPar.pre_processing();
-  gaussSeidelPar.run();
-  gaussSeidelPar.post_processing();
-
-  // Создаем и запускаем последовательную задачу на процессе 0
-  if (world.rank() == 0) {
-    GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
-    ASSERT_TRUE(gaussSeidelSeq.validation());
-    gaussSeidelSeq.pre_processing();
-    gaussSeidelSeq.run();
-    gaussSeidelSeq.post_processing();
-
-    // Получаем результаты из taskData->outputs
-    double* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
-    double* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
-    size_t sizePar = taskDataPar->outputs_count[0];
-    size_t sizeSeq = taskDataSeq->outputs_count[0];
-
-    // Сравниваем размеры выходных данных
-    ASSERT_EQ(sizePar, sizeSeq);
-
-    // Сравниваем результаты
-    for (size_t i = 0; i < sizePar; ++i) {
-      ASSERT_NEAR(resultPar[i], resultSeq[i], 1e-6);
+    // Инициализация xPar и xSeq
+    for (int i = 0; i < N; ++i) {
+      xPar[i] = 0.0;
+      xSeq[i] = 0.0;
     }
-  }
 
-  // Освобождаем память
-  delete[] xPar;
-  delete[] xSeq;
-}
+    // Инициализируем входные данные и результаты на процессе 0
+    if (world.rank() == 0) {
+        // Входные данные для параллельной задачи
+        taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+        taskDataPar->inputs_count.emplace_back(1);  // Количество элементов типа int
+
+        taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&eps));
+        taskDataPar->inputs_count.emplace_back(1);  // Количество элементов типа double
+
+        taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+        taskDataPar->inputs_count.emplace_back(N * N);  // Матрица A размером N x N
+
+        taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+        taskDataPar->inputs_count.emplace_back(N);  // Вектор b размером N
+
+        // Выходные данные для параллельной задачи
+        taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
+        taskDataPar->outputs_count.emplace_back(N);  // Вектор решений x размером N
+
+        // Входные данные для последовательной задачи (идентичны параллельной)
+        taskDataSeq->inputs = taskDataPar->inputs;
+        taskDataSeq->inputs_count = taskDataPar->inputs_count;
+
+        // Выходные данные для последовательной задачи
+        taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+        taskDataSeq->outputs_count.emplace_back(N);
+    }
+
+    // Создаем и запускаем параллельную задачу
+    GaussSeidelParallel gaussSeidelPar(taskDataPar);
+    ASSERT_TRUE(gaussSeidelPar.validation());
+    gaussSeidelPar.pre_processing();
+    gaussSeidelPar.run();
+    gaussSeidelPar.post_processing();
+
+    // Создаем и запускаем последовательную задачу на процессе 0
+    if (world.rank() == 0) {
+        GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
+        ASSERT_TRUE(gaussSeidelSeq.validation());
+        gaussSeidelSeq.pre_processing();
+        gaussSeidelSeq.run();
+        gaussSeidelSeq.post_processing();
+
+        // Получаем результаты из taskData->outputs
+        double* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
+        double* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
+        size_t sizePar = taskDataPar->outputs_count[0];
+        size_t sizeSeq = taskDataSeq->outputs_count[0];
+
+        // Сравниваем размеры выходных данных
+        ASSERT_EQ(sizePar, sizeSeq);
+
+        // Сравниваем результаты
+        for (size_t i = 0; i < sizePar; ++i) {
+        ASSERT_NEAR(resultPar[i], resultSeq[i], 1e-6);
+        }
+    }
+
+    // Освобождаем память
+    delete[] xPar;
+    delete[] xSeq;
+    }
 
 // Тест 1: Неправильное количество входных данных
 TEST(GaussSeidel_MPI, ValidationFailureTestInputCount) {
@@ -115,6 +121,10 @@ TEST(GaussSeidel_MPI, ValidationFailureTestInputCount) {
 
     // Пропускаем некоторые входные данные
     double* xSeq = new double[N];
+    // Инициализация xSeq
+    for (int i = 0; i < N; ++i) {
+      xSeq[i] = 0.0;
+    }
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 
@@ -154,6 +164,12 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
     taskDataSeq->inputs_count.emplace_back(3);
 
     double* xSeq = new double[N];
+
+    // Инициализация xPar и xSeq
+    for (int i = 0; i < N; ++i) {
+      xSeq[i] = 0.0;
+    }
+
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 
@@ -192,6 +208,9 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
     taskDataSeq->inputs_count.emplace_back(N);
 
     double* xSeq = new double[N];
+    for (int i = 0; i < N; ++i) {
+      xSeq[i] = 0.0;
+    }
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 
@@ -231,6 +250,11 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
     // Намеренно добавляем лишний выходной буфер
     double* xSeq1 = new double[N];
     double* xSeq2 = new double[N];
+        // Инициализация xPar и xSeq
+    for (int i = 0; i < N; ++i) {
+      xSeq1[i] = 0.0;
+      xSeq2[i] = 0.0;
+    }
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1));
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2));
     taskDataSeq->outputs_count.emplace_back(N);
@@ -286,6 +310,12 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
   // Выделяем память для выходных данных
   double* xPar = new double[N];
   double* xSeq = new double[N];
+
+  // Инициализация xPar и xSeq
+  for (int i = 0; i < N; ++i) {
+    xPar[i] = 0.0;
+    xSeq[i] = 0.0;
+  }
 
   // Инициализируем входные данные и результаты на процессе 0
   if (world.rank() == 0) {
@@ -393,6 +423,9 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
     taskDataSeq->inputs_count.emplace_back(N);
 
     double* xSeq = new double[N];
+    for (int i = 0; i < N; ++i) {
+      xSeq[i] = 0.0;
+    }
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 
