@@ -40,7 +40,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
   }
 
   // Выделяем память для вектора решений
-  double* xPar = new double[N];
+  auto* xPar = new double[N];
   for (int i = 0; i < N; ++i) {
     xPar[i] = 0.0;
   }
@@ -125,7 +125,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
   }
 
   // Выделяем память для вектора решений
-  double* xPar = new double[N];
+  auto* xPar = new double[N];
 
   // Инициализация xPar и xSeq
   for (int i = 0; i < N; ++i) {

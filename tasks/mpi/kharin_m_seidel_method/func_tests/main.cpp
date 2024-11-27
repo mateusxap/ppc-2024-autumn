@@ -29,8 +29,8 @@ TEST(GaussSeidel_MPI, SimpleData) {
   std::vector<double> b = {15, 15, 10, 10};
 
   // Выделяем память для выходных данных
-  double* xPar = new double[N];
-  double* xSeq = new double[N];
+  auto* xPar = new double[N];
+  auto* xSeq = new double[N];
 
   // Инициализация xPar и xSeq
   for (int i = 0; i < N; ++i) {
@@ -82,8 +82,8 @@ TEST(GaussSeidel_MPI, SimpleData) {
     gaussSeidelSeq.post_processing();
 
     // Получаем результаты из taskData->outputs
-    double* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
-    double* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
+    auto* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
+    auto* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
     size_t sizePar = taskDataPar->outputs_count[0];
     size_t sizeSeq = taskDataSeq->outputs_count[0];
 
@@ -119,7 +119,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestInputCount) {
     taskDataSeq->inputs_count.emplace_back(1);
 
     // Пропускаем некоторые входные данные
-    double* xSeq = new double[N];
+    auto* xSeq = new double[N];
     // Инициализация xSeq
     for (int i = 0; i < N; ++i) {
       xSeq[i] = 0.0;
@@ -162,7 +162,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(3);
 
-    double* xSeq = new double[N];
+    auto* xSeq = new double[N];
 
     // Инициализация xPar и xSeq
     for (int i = 0; i < N; ++i) {
@@ -206,7 +206,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(N);
 
-    double* xSeq = new double[N];
+    auto* xSeq = new double[N];
     for (int i = 0; i < N; ++i) {
       xSeq[i] = 0.0;
     }
@@ -247,8 +247,8 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
     taskDataSeq->inputs_count.emplace_back(N);
 
     // Намеренно добавляем лишний выходной буфер
-    double* xSeq1 = new double[N];
-    double* xSeq2 = new double[N];
+    auto* xSeq1 = new double[N];
+    auto* xSeq2 = new double[N];
     for (int i = 0; i < N; ++i) {
       xSeq1[i] = 0.0;
       xSeq2[i] = 0.0;
@@ -306,8 +306,8 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
   // Выделяем память для выходных данных
-  double* xPar = new double[N];
-  double* xSeq = new double[N];
+  auto* xPar = new double[N];
+  auto* xSeq = new double[N];
 
   // Инициализация xPar и xSeq
   for (int i = 0; i < N; ++i) {
@@ -359,8 +359,8 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
     gaussSeidelSeq.post_processing();
 
     // Получаем результаты из taskData->outputs
-    double* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
-    double* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
+    auto* resultPar = reinterpret_cast<double*>(taskDataPar->outputs[0]);
+    auto* resultSeq = reinterpret_cast<double*>(taskDataSeq->outputs[0]);
     size_t sizePar = taskDataPar->outputs_count[0];
     size_t sizeSeq = taskDataSeq->outputs_count[0];
 
@@ -420,7 +420,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(N);
 
-    double* xSeq = new double[N];
+    auto* xSeq = new double[N];
     for (int i = 0; i < N; ++i) {
       xSeq[i] = 0.0;
     }

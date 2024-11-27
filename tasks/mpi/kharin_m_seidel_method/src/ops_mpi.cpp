@@ -24,7 +24,7 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
   p = new double[n];
 
   // Чтение матрицы A из taskData->inputs[2]
-  double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+  auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
       a[i][j] = a_data[i * n + j];
@@ -32,7 +32,7 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
   }
 
   // Чтение вектора b из taskData->inputs[3]
-  double* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
+  auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
   for (int i = 0; i < n; i++) {
     b[i] = b_data[i];
   }
@@ -47,21 +47,22 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
 
 bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   internal_order_test();
+  bool is_valid = true;
   n = *(reinterpret_cast<int*>(taskData->inputs[0]));
   // Проверка количества входных и выходных данных
   if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
-    return false;
+    is_valid = false;
   }
   // Проверка размеров входных данных
   else if (taskData->inputs_count[0] != static_cast<size_t>(1) || taskData->inputs_count[1] != static_cast<size_t>(1) ||
            taskData->inputs_count[2] != static_cast<size_t>(n * n) ||
            taskData->inputs_count[3] != static_cast<size_t>(n) ||
            taskData->outputs_count[0] != static_cast<size_t>(n)) {
-    return false;
+    is_valid = false;
   }
 
   // Проверка условия сходимости
-  double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+  auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
   for (int i = 0; i < n; ++i) {
     double diag = std::abs(a_data[i * n + i]);
     double sum = 0.0;
@@ -71,11 +72,11 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
       }
     }
     if (diag <= sum) {
-      return false;
+      is_valid = false;
     }
   }
 
-  return true;
+  return is_valid;
 }
 
 bool kharin_m_seidel_method::GaussSeidelSequential::run() {
@@ -118,7 +119,7 @@ bool kharin_m_seidel_method::GaussSeidelSequential::post_processing() {
   internal_order_test();
 
   // Запись результатов в taskData->outputs[0]
-  double* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
+  auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
   for (int i = 0; i < n; i++) {
     x_output[i] = x[i];
   }
@@ -152,7 +153,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
     p = new double[n];
 
     // Чтение матрицы A
-    double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+    auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
         a[i][j] = a_data[i * n + j];
@@ -160,7 +161,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
     }
 
     // Чтение вектора b
-    double* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
+    auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
     for (int i = 0; i < n; i++) {
       b[i] = b_data[i];
     }
@@ -288,7 +289,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::run() {
 
     // Вычисление глобальной нормы
     double global_norm = 0.0;
-    mpi::all_reduce(world, local_norm, global_norm, std::plus<double>());
+    mpi::all_reduce(world, local_norm, global_norm, std::plus<>());
 
     converged = (sqrt(global_norm) < eps);
 
@@ -306,7 +307,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::post_processing() {
 
   if (world.rank() == 0) {
     // Запись результатов в taskData->outputs[0]
-    double* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
+    auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
     for (int i = 0; i < n; i++) {
       x_output[i] = x[i];
     }
