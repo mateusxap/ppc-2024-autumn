@@ -52,15 +52,13 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
     return false;
   }
-
   // Проверка размеров входных данных
-  else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||  // n
-    taskData->inputs_count[1] != static_cast<size_t>(1) ||         // eps
-    taskData->inputs_count[2] != static_cast<size_t>(n * n) ||     // Матрица A
-    taskData->inputs_count[3] != static_cast<size_t>(n) ||         // Вектор b
-    taskData->outputs_count[0] != static_cast<size_t>(n)) {        // Вектор x
-      return false;
-  }
+  else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||      // n
+           taskData->inputs_count[1] != static_cast<size_t>(1) ||      // eps
+           taskData->inputs_count[2] != static_cast<size_t>(n * n) ||  // Матрица A
+           taskData->inputs_count[3] != static_cast<size_t>(n) ||      // Вектор b
+           taskData->outputs_count[0] != static_cast<size_t>(n)) {     // Вектор x
+    return false;
 
   // Проверка условия сходимости
   double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
@@ -216,12 +214,12 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
     }
 
     // Проверка размеров входных данных
-    else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||  // n
-      taskData->inputs_count[1] != static_cast<size_t>(1) ||         // eps
-      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||     // Матрица A
-      taskData->inputs_count[3] != static_cast<size_t>(n) ||         // Вектор b
-      taskData->outputs_count[0] != static_cast<size_t>(n)) {        // Вектор x
-        is_valid = false;
+    else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||      // n
+             taskData->inputs_count[1] != static_cast<size_t>(1) ||      // eps
+             taskData->inputs_count[2] != static_cast<size_t>(n * n) ||  // Матрица A
+             taskData->inputs_count[3] != static_cast<size_t>(n) ||      // Вектор b
+             taskData->outputs_count[0] != static_cast<size_t>(n)) {     // Вектор x
+      is_valid = false;
     }
 
     // Проверка условия сходимости
