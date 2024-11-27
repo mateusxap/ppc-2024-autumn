@@ -3,8 +3,8 @@
 
 #include <boost/mpi.hpp>
 #include <cmath>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 namespace mpi = boost::mpi;
 
@@ -48,18 +48,17 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
 bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   internal_order_test();
   n = *(reinterpret_cast<int*>(taskData->inputs[0]));
-  
   // Проверка количества входных и выходных данных
   if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
     return false;
   }
 
   // Проверка размеров входных данных
-  if (taskData->inputs_count[0] != static_cast<size_t>(1) ||       // n
-      taskData->inputs_count[1] != static_cast<size_t>(1) ||       // eps
-      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||   // Матрица A
-      taskData->inputs_count[3] != static_cast<size_t>(n) ||       // Вектор b
-      taskData->outputs_count[0] != static_cast<size_t>(n)) {      // Вектор x
+  if (taskData->inputs_count[0] != static_cast<size_t>(1) ||      // n
+      taskData->inputs_count[1] != static_cast<size_t>(1) ||      // eps
+      taskData->inputs_count[2] != static_cast<size_t>(n * n) ||  // Матрица A
+      taskData->inputs_count[3] != static_cast<size_t>(n) ||      // Вектор b
+      taskData->outputs_count[0] != static_cast<size_t>(n)) {     // Вектор x
     return false;
   }
 
@@ -204,7 +203,6 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
 
   return true;
 }
-
 
 bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
   internal_order_test();
