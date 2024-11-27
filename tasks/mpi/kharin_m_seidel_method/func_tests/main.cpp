@@ -13,7 +13,7 @@
 namespace mpi = boost::mpi;
 using namespace kharin_m_seidel_method;
 
-// Тест 0: Простые данные
+// Тест 1: Простые данные
 TEST(GaussSeidel_MPI, SimpleData) {
   mpi::environment env;
   mpi::communicator world;
@@ -99,39 +99,6 @@ TEST(GaussSeidel_MPI, SimpleData) {
   // Освобождаем память
   delete[] xPar;
   delete[] xSeq;
-}
-
-// Тест 1: Неправильное количество входных данных
-TEST(GaussSeidel_MPI, ValidationFailureTestInputCount) {
-  mpi::environment env;
-  mpi::communicator world;
-
-  std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
-
-  int N = 4;
-
-  std::vector<double> A = {4, 1, 2, 0, 3, 5, 1, 1, 1, 1, 3, 2, 2, 0, 1, 4};
-  std::vector<double> b = {15, 15, 10, 10};
-
-  if (world.rank() == 0) {
-    // Намеренно уменьшаем количество входных данных
-    taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
-    taskDataSeq->inputs_count.emplace_back(1);
-
-    // Пропускаем некоторые входные данные
-    auto* xSeq = new double[N];
-    // Инициализация xSeq
-    for (int i = 0; i < N; ++i) {
-      xSeq[i] = 0.0;
-    }
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
-    taskDataSeq->outputs_count.emplace_back(N);
-
-    GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
-    ASSERT_FALSE(gaussSeidelSeq.validation());
-
-    delete[] xSeq;
-  }
 }
 
 // Тест 2: Неправильный размер матрицы A

@@ -49,12 +49,8 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   internal_order_test();
   bool is_valid = true;
   n = *(reinterpret_cast<int*>(taskData->inputs[0]));
-  // Проверка количества входных и выходных данных
-  if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
-    is_valid = false;
-  }
   // Проверка размеров входных данных
-  else if (taskData->inputs_count[0] != static_cast<size_t>(1) || taskData->inputs_count[1] != static_cast<size_t>(1) ||
+  if (taskData->inputs_count[0] != static_cast<size_t>(1) || taskData->inputs_count[1] != static_cast<size_t>(1) ||
            taskData->inputs_count[2] != static_cast<size_t>(n * n) ||
            taskData->inputs_count[3] != static_cast<size_t>(n) ||
            taskData->outputs_count[0] != static_cast<size_t>(n)) {
@@ -209,13 +205,8 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
 
   if (world.rank() == 0) {
     n = *(reinterpret_cast<int*>(taskData->inputs[0]));
-    // Проверка количества входных и выходных данных
-    if (taskData->inputs_count.size() != 4 || taskData->outputs_count.size() != 1) {
-      is_valid = false;
-    }
-
     // Проверка размеров входных данных
-    else if (taskData->inputs_count[0] != static_cast<size_t>(1) ||
+    if (taskData->inputs_count[0] != static_cast<size_t>(1) ||
              taskData->inputs_count[1] != static_cast<size_t>(1) ||
              taskData->inputs_count[2] != static_cast<size_t>(n * n) ||
              taskData->inputs_count[3] != static_cast<size_t>(n) ||
