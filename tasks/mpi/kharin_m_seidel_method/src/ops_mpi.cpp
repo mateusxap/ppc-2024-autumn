@@ -224,7 +224,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
     }
 
     // Проверка условия сходимости
-    double* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+    auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
     for (int i = 0; i < n; ++i) {
       double diag = std::abs(a_data[i * n + i]);
       double sum = 0.0;
