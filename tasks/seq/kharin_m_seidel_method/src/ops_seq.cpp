@@ -53,18 +53,20 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
     is_valid = false;
   }
 
-  // Проверка условия сходимости
-  auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-  for (int i = 0; i < n; ++i) {
-    double diag = std::abs(a_data[i * n + i]);
-    double sum = 0.0;
-    for (int j = 0; j < n; ++j) {
-      if (j != i) {
-        sum += std::abs(a_data[i * n + j]);
+  if (is_valid) {
+    // Проверка условия сходимости
+    auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+    for (int i = 0; i < n; ++i) {
+      double diag = std::abs(a_data[i * n + i]);
+      double sum = 0.0;
+      for (int j = 0; j < n; ++j) {
+        if (j != i) {
+          sum += std::abs(a_data[i * n + j]);
+        }
       }
-    }
-    if (diag <= sum) {
-      is_valid = false;
+      if (diag <= sum) {
+        is_valid = false;
+      }
     }
   }
 
