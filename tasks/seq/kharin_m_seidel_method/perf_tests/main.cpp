@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <random>
-#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "seq/kharin_m_seidel_method/include/ops_seq.hpp"

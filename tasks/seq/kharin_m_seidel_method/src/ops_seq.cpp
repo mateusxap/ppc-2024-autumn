@@ -2,8 +2,6 @@
 #include "seq/kharin_m_seidel_method/include/ops_seq.hpp"
 
 #include <cmath>
-#include <iostream>
-#include <memory>
 
 bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
   internal_order_test();

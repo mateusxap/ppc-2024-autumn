@@ -4,9 +4,7 @@
 #include <algorithm>
 #include <boost/mpi.hpp>
 #include <cmath>
-#include <memory>
 #include <random>
-#include <vector>
 
 #include "mpi/kharin_m_seidel_method/include/ops_mpi.hpp"
 

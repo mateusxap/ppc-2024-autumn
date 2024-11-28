@@ -2,9 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <memory>
 #include <random>
-#include <vector>
 
 #include "seq/kharin_m_seidel_method/include/ops_seq.hpp"
 

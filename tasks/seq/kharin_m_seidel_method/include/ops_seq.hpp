@@ -4,7 +4,6 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "core/task/include/task.hpp"

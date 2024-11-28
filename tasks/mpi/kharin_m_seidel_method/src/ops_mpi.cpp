@@ -3,8 +3,6 @@
 
 #include <boost/mpi.hpp>
 #include <cmath>
-#include <iostream>
-#include <memory>
 
 namespace mpi = boost::mpi;
 

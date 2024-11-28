@@ -3,7 +3,6 @@
 
 #include <boost/mpi/timer.hpp>
 #include <random>
-#include <vector>
 
 #include "core/perf/include/perf.hpp"
 #include "mpi/kharin_m_seidel_method/include/ops_mpi.hpp"
