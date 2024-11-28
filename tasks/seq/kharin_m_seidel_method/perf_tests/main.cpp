@@ -64,7 +64,7 @@ TEST(GaussSeidel_Seq_PerfTest, test_pipeline_run) {
   // Создаем атрибуты для тестирования производительности
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 5;  // Количество запусков для усреднения
-  
+
   const auto t0 = std::chrono::high_resolution_clock::now();
   perfAttr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
@@ -138,7 +138,7 @@ TEST(GaussSeidel_Seq_PerfTest, test_task_run) {
   // Создаем атрибуты для тестирования производительности
   auto perfAttr = std::make_shared<ppc::core::PerfAttr>();
   perfAttr->num_running = 5;  // Количество запусков для усреднения
-  
+
   const auto t0 = std::chrono::high_resolution_clock::now();
   perfAttr->current_timer = [&] {
     auto current_time_point = std::chrono::high_resolution_clock::now();
