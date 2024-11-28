@@ -87,9 +87,6 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
 
   if (world.rank() == 0) {
     ppc::core::Perf::print_perf_statistic(perfResults);
-
-    // Опционально: можно добавить проверку корректности решения
-    // Например, вычислить невязку или сравнить с эталонным решением
   }
 
   // Освобождаем память
