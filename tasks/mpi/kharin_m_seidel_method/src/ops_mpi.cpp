@@ -182,10 +182,26 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
     p = new double[n];
   }
 
-  // Распространение матрицы A и вектора b
-  for (int i = 0; i < n; i++) {
-    mpi::broadcast(world, a[i], n, 0);
+  // Распространение матрицы A полностью за один раз
+  std::vector<double> a_flat(n * n);
+  if (world.rank() == 0) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        a_flat[i * n + j] = a[i][j];
+      }
+    }
   }
+  mpi::broadcast(world, a_flat.data(), n * n, 0);
+
+  // Восстановление матрицы A на других процессах
+  if (world.rank() != 0) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        a[i][j] = a_flat[i * n + j];
+      }
+    }
+  }
+
   mpi::broadcast(world, b, n, 0);
 
   // Инициализация x на остальных процессах
