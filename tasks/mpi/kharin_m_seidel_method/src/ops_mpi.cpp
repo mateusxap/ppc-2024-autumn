@@ -194,7 +194,6 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
   return is_valid;
 }
 
-
 bool kharin_m_seidel_method::GaussSeidelParallel::run() {
   internal_order_test();
 
