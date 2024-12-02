@@ -158,8 +158,8 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
     n = *(reinterpret_cast<int*>(taskData->inputs[0]));
     // Проверка размеров входных данных
     if (taskData->inputs_count[0] != static_cast<size_t>(1) || taskData->inputs_count[1] != static_cast<size_t>(1) ||
-        taskData->inputs_count[2] != static_cast<size_t>(n * n) || taskData->inputs_count[3] != static_cast<size_t>(n) ||
-        taskData->outputs_count[0] != static_cast<size_t>(n)) {
+        taskData->inputs_count[2] != static_cast<size_t>(n * n) ||
+        taskData->inputs_count[3] != static_cast<size_t>(n) || taskData->outputs_count[0] != static_cast<size_t>(n)) {
       is_valid = false;
     }
 
