@@ -1,4 +1,4 @@
-// ops_mpi.cpp
+// ops_seq.cpp
 #include "seq/kharin_m_seidel_method/include/ops_seq.hpp"
 
 #include <cmath>
@@ -9,33 +9,18 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
   // Чтение eps из taskData
   eps = *(reinterpret_cast<double*>(taskData->inputs[1]));
 
-  // Выделение памяти для матрицы и векторов
-  a = new double*[n];
-  for (int i = 0; i < n; i++) {
-    a[i] = new double[n];
-  }
-  b = new double[n];
-  x = new double[n];
-  p = new double[n];
+  a.resize(n * n);
+  b.resize(n);
+  x.resize(n, 1.0);  // Инициализация x значением 1.0
+  p.resize(n);
 
   // Чтение матрицы A из taskData->inputs[2]
   auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      a[i][j] = a_data[i * n + j];
-    }
-  }
+  std::copy(a_data, a_data + n * n, a.begin());
 
   // Чтение вектора b из taskData->inputs[3]
   auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
-  for (int i = 0; i < n; i++) {
-    b[i] = b_data[i];
-  }
-
-  // Инициализация вектора x
-  for (int i = 0; i < n; i++) {
-    x[i] = 1.0;
-  }
+  std::copy(b_data, b_data + n, b.begin());
 
   return true;
 }
@@ -52,8 +37,10 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   }
 
   if (is_valid) {
-    // Проверка условия сходимости
+    // Чтение матрицы A из taskData->inputs[2]
     auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+
+    // Проверка условия сходимости и единственности решения
     for (int i = 0; i < n; ++i) {
       double diag = std::abs(a_data[i * n + i]);
       double sum = 0.0;
@@ -62,12 +49,13 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
           sum += std::abs(a_data[i * n + j]);
         }
       }
-      if (diag <= sum) {
+      if (diag <= sum || a_data[i * n + i] == 0.0) {
+        std::cerr << "Матрица A не является строго диагонально доминантной или имеет нулевой элемент на диагонали в строке " << i << ".\n";
         is_valid = false;
+        break;
       }
     }
   }
-
   return is_valid;
 }
 
@@ -75,24 +63,21 @@ bool kharin_m_seidel_method::GaussSeidelSequential::run() {
   internal_order_test();
 
   bool converged = false;
-  int max_iterations = 10000;  // Максимальное количество итераций
   int m = 0;
 
   while (!converged && m < max_iterations) {
     // Копирование x в p
-    for (int i = 0; i < n; i++) {
-      p[i] = x[i];
-    }
+    p = x;
 
     // Обновление x
     for (int i = 0; i < n; i++) {
       double var = 0.0;
       for (int j = 0; j < n; j++) {
         if (j != i) {
-          var += a[i][j] * x[j];
+          var += a[i * n + j] * x[j];
         }
       }
-      x[i] = (b[i] - var) / a[i][i];
+      x[i] = (b[i] - var) / a[i * n + i];
     }
 
     // Проверка сходимости
@@ -112,18 +97,6 @@ bool kharin_m_seidel_method::GaussSeidelSequential::post_processing() {
 
   // Запись результатов в taskData->outputs[0]
   auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
-  for (int i = 0; i < n; i++) {
-    x_output[i] = x[i];
-  }
-
-  // Освобождение памяти
-  for (int i = 0; i < n; i++) {
-    delete[] a[i];
-  }
-  delete[] a;
-  delete[] b;
-  delete[] x;
-  delete[] p;
-
+  std::copy(x.begin(), x.end(), x_output);
   return true;
 }

@@ -12,33 +12,18 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
   // Чтение eps из taskData
   eps = *(reinterpret_cast<double*>(taskData->inputs[1]));
 
-  // Выделение памяти для матрицы и векторов
-  a = new double*[n];
-  for (int i = 0; i < n; i++) {
-    a[i] = new double[n];
-  }
-  b = new double[n];
-  x = new double[n];
-  p = new double[n];
+  a.resize(n * n);
+  b.resize(n);
+  x.resize(n, 1.0);  // Инициализация x значением 1.0
+  p.resize(n);
 
   // Чтение матрицы A из taskData->inputs[2]
   auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n; j++) {
-      a[i][j] = a_data[i * n + j];
-    }
-  }
+  std::copy(a_data, a_data + n * n, a.begin());
 
   // Чтение вектора b из taskData->inputs[3]
   auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
-  for (int i = 0; i < n; i++) {
-    b[i] = b_data[i];
-  }
-
-  // Инициализация вектора x
-  for (int i = 0; i < n; i++) {
-    x[i] = 1.0;
-  }
+  std::copy(b_data, b_data + n, b.begin());
 
   return true;
 }
@@ -55,8 +40,10 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
   }
 
   if (is_valid) {
-    // Проверка условия сходимости
+    // Чтение матрицы A из taskData->inputs[2]
     auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+
+    // Проверка условия сходимости и единственности решения
     for (int i = 0; i < n; ++i) {
       double diag = std::abs(a_data[i * n + i]);
       double sum = 0.0;
@@ -65,8 +52,10 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
           sum += std::abs(a_data[i * n + j]);
         }
       }
-      if (diag <= sum) {
+      if (diag <= sum || a_data[i * n + i] == 0.0) {
+        std::cerr << "Матрица A не является строго диагонально доминантной или имеет нулевой элемент на диагонали в строке " << i << ".\n";
         is_valid = false;
+        break;
       }
     }
   }
@@ -77,24 +66,21 @@ bool kharin_m_seidel_method::GaussSeidelSequential::run() {
   internal_order_test();
 
   bool converged = false;
-  int max_iterations = 10000;  // Максимальное количество итераций
   int m = 0;
 
   while (!converged && m < max_iterations) {
     // Копирование x в p
-    for (int i = 0; i < n; i++) {
-      p[i] = x[i];
-    }
+    p = x;
 
     // Обновление x
     for (int i = 0; i < n; i++) {
       double var = 0.0;
       for (int j = 0; j < n; j++) {
         if (j != i) {
-          var += a[i][j] * x[j];
+          var += a[i * n + j] * x[j];
         }
       }
-      x[i] = (b[i] - var) / a[i][i];
+      x[i] = (b[i] - var) / a[i * n + i];
     }
 
     // Проверка сходимости
@@ -114,19 +100,7 @@ bool kharin_m_seidel_method::GaussSeidelSequential::post_processing() {
 
   // Запись результатов в taskData->outputs[0]
   auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
-  for (int i = 0; i < n; i++) {
-    x_output[i] = x[i];
-  }
-
-  // Освобождение памяти
-  for (int i = 0; i < n; i++) {
-    delete[] a[i];
-  }
-  delete[] a;
-  delete[] b;
-  delete[] x;
-  delete[] p;
-
+  std::copy(x.begin(), x.end(), x_output);
   return true;
 }
 
@@ -136,29 +110,19 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
   // Процесс 0 считывает данные
   if (world.rank() == 0) {
     eps = *(reinterpret_cast<double*>(taskData->inputs[1]));
-
-    // Выделение памяти
-    a = new double*[n];
-    for (int i = 0; i < n; i++) {
-      a[i] = new double[n];
-    }
-    b = new double[n];
-    x = new double[n];
-    p = new double[n];
+    // Инициализация векторов
+    a.resize(n * n);
+    b.resize(n);
+    x.resize(n, 1.0);  // Инициализация x значением 1.0
+    p.resize(n);
 
     // Чтение матрицы A
     auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        a[i][j] = a_data[i * n + j];
-      }
-    }
+    std::copy(a_data, a_data + n * n, a.begin());
 
     // Чтение вектора b
     auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
-    for (int i = 0; i < n; i++) {
-      b[i] = b_data[i];
-    }
+    std::copy(b_data, b_data + n, b.begin());
 
     // Инициализация x
     for (int i = 0; i < n; i++) {
@@ -169,47 +133,18 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
   // Распространение n и eps
   mpi::broadcast(world, n, 0);
   mpi::broadcast(world, eps, 0);
+  mpi::broadcast(world, max_iterations, 0);
 
   if (world.rank() != 0) {
-    // Выделение памяти
-    a = new double*[n];
-    for (int i = 0; i < n; i++) {
-      a[i] = new double[n];
-    }
-    b = new double[n];
-    x = new double[n];
-    p = new double[n];
+    // Инициализация векторов
+    a.resize(n * n);
+    b.resize(n);
+    x.resize(n, 1.0);
+    p.resize(n);
   }
-
-  // Распространение матрицы A полностью за один раз
-  std::vector<double> a_flat(n * n);
-  if (world.rank() == 0) {
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        a_flat[i * n + j] = a[i][j];
-      }
-    }
-  }
-  mpi::broadcast(world, a_flat.data(), n * n, 0);
-
-  // Восстановление матрицы A на других процессах
-  if (world.rank() != 0) {
-    for (int i = 0; i < n; i++) {
-      for (int j = 0; j < n; j++) {
-        a[i][j] = a_flat[i * n + j];
-      }
-    }
-  }
-
-  mpi::broadcast(world, b, n, 0);
-
-  // Инициализация x на остальных процессах
-  if (world.rank() != 0) {
-    for (int i = 0; i < n; i++) {
-      x[i] = 1.0;
-    }
-  }
-
+  // Распространение матрицы A и вектора b
+  mpi::broadcast(world, a.data(), n * n, 0);
+  mpi::broadcast(world, b.data(), n, 0);
   return true;
 }
 
@@ -221,14 +156,16 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
     n = *(reinterpret_cast<int*>(taskData->inputs[0]));
     // Проверка размеров входных данных
     if (taskData->inputs_count[0] != static_cast<size_t>(1) || taskData->inputs_count[1] != static_cast<size_t>(1) ||
-        taskData->inputs_count[2] != static_cast<size_t>(n * n) ||
-        taskData->inputs_count[3] != static_cast<size_t>(n) || taskData->outputs_count[0] != static_cast<size_t>(n)) {
+        taskData->inputs_count[2] != static_cast<size_t>(n * n) || taskData->inputs_count[3] != static_cast<size_t>(n) ||
+        taskData->outputs_count[0] != static_cast<size_t>(n)) {
       is_valid = false;
     }
 
     if (is_valid) {
-      // Проверка условия сходимости
+      // Чтение матрицы A из taskData->inputs[2]
       auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
+
+      // Проверка условия сходимости и единственности решения
       for (int i = 0; i < n; ++i) {
         double diag = std::abs(a_data[i * n + i]);
         double sum = 0.0;
@@ -237,9 +174,10 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
             sum += std::abs(a_data[i * n + j]);
           }
         }
-        if (diag <= sum) {
-          std::cerr << "Матрица A не является строго диагонально доминантной в строке " << i << ".\n";
+        if (diag <= sum || a_data[i * n + i] == 0.0) {
+          std::cerr << "Матрица A не является строго диагонально доминантной или имеет нулевой элемент на диагонали в строке " << i << ".\n";
           is_valid = false;
+          break;
         }
       }
     }
@@ -252,6 +190,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
   return is_valid;
 }
 
+
 bool kharin_m_seidel_method::GaussSeidelParallel::run() {
   internal_order_test();
 
@@ -259,31 +198,28 @@ bool kharin_m_seidel_method::GaussSeidelParallel::run() {
   int end = (world.rank() + 1) * n / world.size();
 
   bool converged = false;
-  int max_iterations = 10000;
   int m = 0;
 
   while (!converged && m < max_iterations) {
     // Копирование x в p
-    for (int i = 0; i < n; i++) {
-      p[i] = x[i];
-    }
+    p = x;
 
     // Обновление x для своих строк
     for (int i = start; i < end; i++) {
       double var = 0.0;
       for (int j = 0; j < n; j++) {
         if (j != i) {
-          var += a[i][j] * x[j];
+          var += a[i * n + j] * x[j];
         }
       }
-      x[i] = (b[i] - var) / a[i][i];
+      x[i] = (b[i] - var) / a[i * n + i];
     }
 
     // Объединение обновленных значений x
     for (int i = 0; i < world.size(); i++) {
       int s = i * n / world.size();
       int e = (i + 1) * n / world.size();
-      mpi::broadcast(world, x + s, e - s, i);
+      mpi::broadcast(world, &x[s], e - s, i);
     }
 
     // Вычисление локальной нормы
@@ -313,19 +249,8 @@ bool kharin_m_seidel_method::GaussSeidelParallel::post_processing() {
   if (world.rank() == 0) {
     // Запись результатов в taskData->outputs[0]
     auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
-    for (int i = 0; i < n; i++) {
-      x_output[i] = x[i];
-    }
+    std::copy(x.begin(), x.end(), x_output);
   }
-
-  // Освобождение памяти
-  for (int i = 0; i < n; i++) {
-    delete[] a[i];
-  }
-  delete[] a;
-  delete[] b;
-  delete[] x;
-  delete[] p;
 
   return true;
 }
