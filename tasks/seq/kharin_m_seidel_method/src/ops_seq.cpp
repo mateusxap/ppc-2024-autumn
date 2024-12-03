@@ -54,12 +54,10 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
         break;
       }
     }
-    if (is_valid)
-    {
+    if (is_valid) {
       // Метод Гаусса для определения ранга
       int rank = 0;
       std::vector<bool> row_used(n, false);
-      
       for (int j = 0; j < n; ++j) {
         int pivot_row = -1;
         for (int i = 0; i < n; ++i) {
@@ -68,12 +66,9 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
             break;
           }
         }
-        
         if (pivot_row == -1) continue;
-        
         row_used[pivot_row] = true;
         rank++;
-        
         // Вычитание строк для приведения к треугольному виду
         for (int i = 0; i < n; ++i) {
           if (i != pivot_row && std::abs(a_data[i * n + j]) > 1e-10) {
