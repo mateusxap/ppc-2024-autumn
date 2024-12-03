@@ -21,7 +21,6 @@ TEST(GaussSeidel_Sequential, SimpleData) {
 
   std::vector<double> xSeq(N, 0.0);
 
-
   // Входные данные для последовательной задачи
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
   taskDataSeq->inputs_count.emplace_back(1);  // Количество элементов типа int

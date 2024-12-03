@@ -349,6 +349,5 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
 
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
-
   }
 }
