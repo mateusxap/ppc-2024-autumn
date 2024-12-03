@@ -49,13 +49,43 @@ bool kharin_m_seidel_method::GaussSeidelSequential::validation() {
           sum += std::abs(a_data[i * n + j]);
         }
       }
-      if (diag <= sum || a_data[i * n + i] == 0.0) {
-        std::cerr
-            << "Матрица A не является строго диагонально доминантной или имеет нулевой элемент на диагонали в строке "
-            << i << ".\n";
+      if (diag <= sum) {
         is_valid = false;
         break;
       }
+    }
+    if (is_valid)
+    {
+      // Метод Гаусса для определения ранга
+      int rank = 0;
+      std::vector<bool> row_used(n, false);
+      
+      for (int j = 0; j < n; ++j) {
+        int pivot_row = -1;
+        for (int i = 0; i < n; ++i) {
+          if (!row_used[i] && std::abs(a_data[i * n + j]) > 1e-10) {
+            pivot_row = i;
+            break;
+          }
+        }
+        
+        if (pivot_row == -1) continue;
+        
+        row_used[pivot_row] = true;
+        rank++;
+        
+        // Вычитание строк для приведения к треугольному виду
+        for (int i = 0; i < n; ++i) {
+          if (i != pivot_row && std::abs(a_data[i * n + j]) > 1e-10) {
+            double factor = a_data[i * n + j] / a_data[pivot_row * n + j];
+            for (int k = j; k < n; ++k) {
+              a_data[i * n + k] -= factor * a_data[pivot_row * n + k];
+            }
+          }
+        }
+      }
+      // Проверяем, полный ли ранг
+      is_valid = (rank == n);
     }
   }
   return is_valid;
