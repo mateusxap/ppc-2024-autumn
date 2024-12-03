@@ -30,11 +30,8 @@ TEST(GaussSeidel_MPI, SimpleData) {
   auto* xPar = new double[N];
   auto* xSeq = new double[N];
 
-  // Инициализация xPar и xSeq
-  for (int i = 0; i < N; ++i) {
-    xPar[i] = 0.0;
-    xSeq[i] = 0.0;
-  }
+  std::fill(xPar, xPar + N, 0.0);
+  std::fill(xSeq, xSeq + N, 0.0);
 
   // Инициализируем входные данные и результаты на процессе 0
   if (world.rank() == 0) {
@@ -129,10 +126,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
 
     auto* xSeq = new double[N];
 
-    // Инициализация xPar и xSeq
-    for (int i = 0; i < N; ++i) {
-      xSeq[i] = 0.0;
-    }
+    std::fill(xSeq, xSeq + N, 0.0);
 
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
@@ -172,9 +166,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
     taskDataSeq->inputs_count.emplace_back(N);
 
     auto* xSeq = new double[N];
-    for (int i = 0; i < N; ++i) {
-      xSeq[i] = 0.0;
-    }
+    std::fill(xSeq, xSeq + N, 0.0);
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 
@@ -274,11 +266,8 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
   auto* xPar = new double[N];
   auto* xSeq = new double[N];
 
-  // Инициализация xPar и xSeq
-  for (int i = 0; i < N; ++i) {
-    xPar[i] = 0.0;
-    xSeq[i] = 0.0;
-  }
+  std::fill(xPar, xPar + N, 0.0);
+  std::fill(xSeq, xSeq + N, 0.0);
 
   // Инициализируем входные данные и результаты на процессе 0
   if (world.rank() == 0) {
@@ -386,9 +375,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
     taskDataSeq->inputs_count.emplace_back(N);
 
     auto* xSeq = new double[N];
-    for (int i = 0; i < N; ++i) {
-      xSeq[i] = 0.0;
-    }
+    std::fill(xSeq, xSeq + N, 0.0);
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
     taskDataSeq->outputs_count.emplace_back(N);
 

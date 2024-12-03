@@ -40,9 +40,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
 
   // Выделяем память для вектора решений
   auto* xPar = new double[N];
-  for (int i = 0; i < N; ++i) {
-    xPar[i] = 0.0;
-  }
+  std::fill(xPar, xPar + N, 0.0);
 
   // Создаем TaskData для параллельной версии
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
@@ -123,10 +121,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
   // Выделяем память для вектора решений
   auto* xPar = new double[N];
 
-  // Инициализация xPar и xSeq
-  for (int i = 0; i < N; ++i) {
-    xPar[i] = 0.0;
-  }
+  std::fill(xPar, xPar + N, 0.0);
 
   // Создаем TaskData для параллельной версии
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();

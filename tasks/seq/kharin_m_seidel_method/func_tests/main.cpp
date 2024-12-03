@@ -23,9 +23,7 @@ TEST(GaussSeidel_Sequential, SimpleData) {
   auto* xSeq = new double[N];
 
   // Инициализация xSeq
-  for (int i = 0; i < N; ++i) {
-    xSeq[i] = 0.0;
-  }
+  std::fill(xSeq, xSeq + N, 0.0);
 
   // Входные данные для последовательной задачи
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
@@ -90,9 +88,7 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestMatrixSize) {
   auto* xSeq = new double[N];
 
   // Инициализация xSeq
-  for (int i = 0; i < N; ++i) {
-    xSeq[i] = 0.0;
-  }
+  std::fill(xSeq, xSeq + N, 0.0);
 
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
   taskDataSeq->outputs_count.emplace_back(N);
@@ -127,9 +123,7 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestNonDiagonallyDominant) {
   taskDataSeq->inputs_count.emplace_back(N);
 
   auto* xSeq = new double[N];
-  for (int i = 0; i < N; ++i) {
-    xSeq[i] = 0.0;
-  }
+  std::fill(xSeq, xSeq + N, 0.0);
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
   taskDataSeq->outputs_count.emplace_back(N);
 
@@ -164,10 +158,8 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestOutputCount) {
   // Намеренно добавляем лишний выходной буфер
   auto* xSeq1 = new double[N];
   auto* xSeq2 = new double[N];
-  for (int i = 0; i < N; ++i) {
-    xSeq1[i] = 0.0;
-    xSeq2[i] = 0.0;
-  }
+  std::fill(xSeq1, xSeq1 + N, 0.0);
+  std::fill(xSeq2, xSeq2 + N, 0.0);
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1));
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2));
   taskDataSeq->outputs_count.emplace_back(N);
@@ -219,9 +211,7 @@ TEST(GaussSeidel, RandomDiagonallyDominantMatrix) {
   auto* xSeq = new double[N];
 
   // Инициализация xSeq
-  for (int i = 0; i < N; ++i) {
-    xSeq[i] = 0.0;
-  }
+  std::fill(xSeq, xSeq + N, 0.0);
 
   // Входные данные для последовательной задачи
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
@@ -290,9 +280,7 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestZerosDiagonally) {
   taskDataSeq->inputs_count.emplace_back(N);
 
   auto* xSeq = new double[N];
-  for (int i = 0; i < N; ++i) {
-    xSeq[i] = 0.0;
-  }
+  std::fill(xSeq, xSeq + N, 0.0);
   taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
   taskDataSeq->outputs_count.emplace_back(N);
 

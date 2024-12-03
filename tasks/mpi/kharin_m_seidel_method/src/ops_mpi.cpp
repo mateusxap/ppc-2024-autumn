@@ -152,26 +152,8 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
     std::copy(b_data, b_data + n, b.begin());
 
     // Инициализация x
-    for (int i = 0; i < n; i++) {
-      x[i] = 1.0;
-    }
+    std::fill(x.begin(), x.end(), 1.0);
   }
-
-  // Распространение n и eps
-  mpi::broadcast(world, n, 0);
-  mpi::broadcast(world, eps, 0);
-  mpi::broadcast(world, max_iterations, 0);
-
-  if (world.rank() != 0) {
-    // Инициализация векторов
-    a.resize(n * n);
-    b.resize(n);
-    x.resize(n, 1.0);
-    p.resize(n);
-  }
-  // Распространение матрицы A и вектора b
-  mpi::broadcast(world, a.data(), n * n, 0);
-  mpi::broadcast(world, b.data(), n, 0);
   return true;
 }
 
@@ -246,6 +228,20 @@ bool kharin_m_seidel_method::GaussSeidelParallel::validation() {
 
 bool kharin_m_seidel_method::GaussSeidelParallel::run() {
   internal_order_test();
+
+  // Распространение n и eps
+  mpi::broadcast(world, eps, 0);
+
+  if (world.rank() != 0) {
+    // Инициализация векторов
+    a.resize(n * n);
+    b.resize(n);
+    x.resize(n, 1.0);
+    p.resize(n);
+  }
+  // Распространение матрицы A и вектора b
+  mpi::broadcast(world, a.data(), n * n, 0);
+  mpi::broadcast(world, b.data(), n, 0);
 
   int start = world.rank() * n / world.size();
   int end = (world.rank() + 1) * n / world.size();

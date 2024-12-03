@@ -7,6 +7,7 @@
 #include <boost/mpi/environment.hpp>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "core/task/include/task.hpp"
 
