@@ -19,11 +19,8 @@ TEST(GaussSeidel_Sequential, SimpleData) {
   std::vector<double> A = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
   std::vector<double> b = {15, 15, 10, 10};
 
-  // Выделяем память для выходных данных
-  auto* xSeq = new double[N];
+  std::vector<double> xSeq(N, 0.0);
 
-  // Инициализация xSeq
-  std::fill(xSeq, xSeq + N, 0.0);
 
   // Входные данные для последовательной задачи
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
@@ -39,7 +36,7 @@ TEST(GaussSeidel_Sequential, SimpleData) {
   taskDataSeq->inputs_count.emplace_back(N);  // Вектор b размером N
 
   // Выходные данные для последовательной задачи
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
   taskDataSeq->outputs_count.emplace_back(N);  // Вектор решений x размером N
 
   // Создаем и запускаем последовательную задачу
@@ -56,9 +53,6 @@ TEST(GaussSeidel_Sequential, SimpleData) {
   for (int i = 0; i < N; ++i) {
     ASSERT_NEAR(result[i], b[i], eps);
   }
-
-  // Освобождаем память
-  delete[] xSeq;
 }
 
 // Тест 2: Неправильный размер матрицы A
@@ -85,18 +79,13 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestMatrixSize) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   taskDataSeq->inputs_count.emplace_back(3);
 
-  auto* xSeq = new double[N];
+  std::vector<double> xSeq(N, 0.0);
 
-  // Инициализация xSeq
-  std::fill(xSeq, xSeq + N, 0.0);
-
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
   taskDataSeq->outputs_count.emplace_back(N);
 
   GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
   ASSERT_FALSE(gaussSeidelSeq.validation());
-
-  delete[] xSeq;
 }
 
 // Тест 3: Матрица не диагонально доминантная
@@ -122,15 +111,13 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestNonDiagonallyDominant) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   taskDataSeq->inputs_count.emplace_back(N);
 
-  auto* xSeq = new double[N];
-  std::fill(xSeq, xSeq + N, 0.0);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+  std::vector<double> xSeq(N, 0.0);
+
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
   taskDataSeq->outputs_count.emplace_back(N);
 
   GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
   ASSERT_FALSE(gaussSeidelSeq.validation());
-
-  delete[] xSeq;
 }
 
 // Тест 4: Неправильное количество выходных данных
@@ -155,21 +142,16 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestOutputCount) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   taskDataSeq->inputs_count.emplace_back(N);
 
-  // Намеренно добавляем лишний выходной буфер
-  auto* xSeq1 = new double[N];
-  auto* xSeq2 = new double[N];
-  std::fill(xSeq1, xSeq1 + N, 0.0);
-  std::fill(xSeq2, xSeq2 + N, 0.0);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1));
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2));
+  std::vector<double> xSeq1(N, 0.0);
+  std::vector<double> xSeq2(N, 0.0);
+
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1.data()));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2.data()));
   taskDataSeq->outputs_count.emplace_back(N);
   taskDataSeq->outputs_count.emplace_back(N);
 
   GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
   ASSERT_FALSE(gaussSeidelSeq.validation());
-
-  delete[] xSeq1;
-  delete[] xSeq2;
 }
 
 // Тест 5: Случайная диагонально доминантная матрица
@@ -207,11 +189,7 @@ TEST(GaussSeidel, RandomDiagonallyDominantMatrix) {
   // Создаем TaskData для последовательной версии
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
-  // Выделяем память для выходных данных
-  auto* xSeq = new double[N];
-
-  // Инициализация xSeq
-  std::fill(xSeq, xSeq + N, 0.0);
+  std::vector<double> xSeq(N, 0.0);
 
   // Входные данные для последовательной задачи
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
@@ -227,7 +205,7 @@ TEST(GaussSeidel, RandomDiagonallyDominantMatrix) {
   taskDataSeq->inputs_count.emplace_back(N);
 
   // Выходные данные для последовательной задачи
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
   taskDataSeq->outputs_count.emplace_back(N);
 
   // Создаем и запускаем последовательную задачу
@@ -251,9 +229,6 @@ TEST(GaussSeidel, RandomDiagonallyDominantMatrix) {
       EXPECT_GT(diagonalElement, offDiagonalSum);
     }
   });
-
-  // Освобождаем память
-  delete[] xSeq;
 }
 
 // Тест 6: Нули на диагонали
@@ -279,13 +254,11 @@ TEST(GaussSeidel_Sequential, ValidationFailureTestZerosDiagonally) {
   taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
   taskDataSeq->inputs_count.emplace_back(N);
 
-  auto* xSeq = new double[N];
-  std::fill(xSeq, xSeq + N, 0.0);
-  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+  std::vector<double> xSeq(N, 0.0);
+
+  taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
   taskDataSeq->outputs_count.emplace_back(N);
 
   GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
   ASSERT_FALSE(gaussSeidelSeq.validation());
-
-  delete[] xSeq;
 }

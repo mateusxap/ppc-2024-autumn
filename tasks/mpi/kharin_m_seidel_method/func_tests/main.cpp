@@ -26,12 +26,8 @@ TEST(GaussSeidel_MPI, SimpleData) {
   std::vector<double> A = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
   std::vector<double> b = {15, 15, 10, 10};
 
-  // Выделяем память для выходных данных
-  auto* xPar = new double[N];
-  auto* xSeq = new double[N];
-
-  std::fill(xPar, xPar + N, 0.0);
-  std::fill(xSeq, xSeq + N, 0.0);
+  std::vector<double> xPar(N, 0.0);
+  std::vector<double> xSeq(N, 0.0);
 
   // Инициализируем входные данные и результаты на процессе 0
   if (world.rank() == 0) {
@@ -49,7 +45,7 @@ TEST(GaussSeidel_MPI, SimpleData) {
     taskDataPar->inputs_count.emplace_back(N);  // Вектор b размером N
 
     // Выходные данные для параллельной задачи
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
     taskDataPar->outputs_count.emplace_back(N);  // Вектор решений x размером N
 
     // Входные данные для последовательной задачи (идентичны параллельной)
@@ -57,7 +53,7 @@ TEST(GaussSeidel_MPI, SimpleData) {
     taskDataSeq->inputs_count = taskDataPar->inputs_count;
 
     // Выходные данные для последовательной задачи
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
   }
 
@@ -90,10 +86,6 @@ TEST(GaussSeidel_MPI, SimpleData) {
       ASSERT_NEAR(resultPar[i], resultSeq[i], 1e-6);
     }
   }
-
-  // Освобождаем память
-  delete[] xPar;
-  delete[] xSeq;
 }
 
 // Тест 2: Неправильный размер матрицы A
@@ -124,17 +116,13 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(3);
 
-    auto* xSeq = new double[N];
+    std::vector<double> xSeq(N, 0.0);
 
-    std::fill(xSeq, xSeq + N, 0.0);
-
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
-
-    delete[] xSeq;
   }
 }
 
@@ -165,15 +153,12 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(N);
 
-    auto* xSeq = new double[N];
-    std::fill(xSeq, xSeq + N, 0.0);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+    std::vector<double> xSeq(N, 0.0);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
-
-    delete[] xSeq;
   }
 }
 
@@ -203,23 +188,15 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(N);
 
-    // Намеренно добавляем лишний выходной буфер
-    auto* xSeq1 = new double[N];
-    auto* xSeq2 = new double[N];
-    for (int i = 0; i < N; ++i) {
-      xSeq1[i] = 0.0;
-      xSeq2[i] = 0.0;
-    }
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1));
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2));
+    std::vector<double> xSeq1(N, 0.0);
+    std::vector<double> xSeq2(N, 0.0);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1.data()));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2.data()));
     taskDataSeq->outputs_count.emplace_back(N);
     taskDataSeq->outputs_count.emplace_back(N);
 
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
-
-    delete[] xSeq1;
-    delete[] xSeq2;
   }
 }
 
@@ -262,12 +239,8 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
-  // Выделяем память для выходных данных
-  auto* xPar = new double[N];
-  auto* xSeq = new double[N];
-
-  std::fill(xPar, xPar + N, 0.0);
-  std::fill(xSeq, xSeq + N, 0.0);
+  std::vector<double> xPar(N, 0.0);
+  std::vector<double> xSeq(N, 0.0);
 
   // Инициализируем входные данные и результаты на процессе 0
   if (world.rank() == 0) {
@@ -285,7 +258,7 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
     taskDataPar->inputs_count.emplace_back(N);
 
     // Выходные данные для параллельной задачи
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
     taskDataPar->outputs_count.emplace_back(N);
 
     // Входные данные для последовательной задачи (идентичны параллельной)
@@ -293,7 +266,7 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
     taskDataSeq->inputs_count = taskDataPar->inputs_count;
 
     // Выходные данные для последовательной задачи
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
   }
 
@@ -341,10 +314,6 @@ TEST(GaussSeidel_MPI, RandomDiagonallyDominantMatrix) {
       }
     });
   }
-
-  // Освобождаем память
-  delete[] xPar;
-  delete[] xSeq;
 }
 
 // Тест 6: Нули на диагонали
@@ -374,14 +343,12 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataSeq->inputs_count.emplace_back(N);
 
-    auto* xSeq = new double[N];
-    std::fill(xSeq, xSeq + N, 0.0);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq));
+    std::vector<double> xSeq(N, 0.0);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
 
-    delete[] xSeq;
   }
 }

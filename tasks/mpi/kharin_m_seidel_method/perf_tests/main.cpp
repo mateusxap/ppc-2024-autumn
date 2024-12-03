@@ -38,9 +38,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
     b[i] = dis(gen);
   }
 
-  // Выделяем память для вектора решений
-  auto* xPar = new double[N];
-  std::fill(xPar, xPar + N, 0.0);
+  std::vector<double> xPar(N, 0.0);
 
   // Создаем TaskData для параллельной версии
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
@@ -58,7 +56,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataPar->inputs_count.emplace_back(N);
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
     taskDataPar->outputs_count.emplace_back(N);
   }
 
@@ -85,9 +83,6 @@ TEST(GaussSeidel_MPI_PerfTest, test_pipeline_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::print_perf_statistic(perfResults);
   }
-
-  // Освобождаем память
-  delete[] xPar;
 }
 
 TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
@@ -118,10 +113,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
     b[i] = dis(gen);
   }
 
-  // Выделяем память для вектора решений
-  auto* xPar = new double[N];
-
-  std::fill(xPar, xPar + N, 0.0);
+  std::vector<double> xPar(N, 0.0);
 
   // Создаем TaskData для параллельной версии
   std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
@@ -139,7 +131,7 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
     taskDataPar->inputs_count.emplace_back(N);
 
-    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar));
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
     taskDataPar->outputs_count.emplace_back(N);
   }
 
@@ -166,7 +158,4 @@ TEST(GaussSeidel_MPI_PerfTest, test_task_run) {
   if (world.rank() == 0) {
     ppc::core::Perf::print_perf_statistic(perfResults);
   }
-
-  // Освобождаем память
-  delete[] xPar;
 }
