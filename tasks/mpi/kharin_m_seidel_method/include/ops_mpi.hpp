@@ -5,9 +5,9 @@
 
 #include <boost/mpi/communicator.hpp>
 #include <boost/mpi/environment.hpp>
+#include <algorithm>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
 #include "core/task/include/task.hpp"
 

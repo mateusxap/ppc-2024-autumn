@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
 #include "core/task/include/task.hpp"
 
