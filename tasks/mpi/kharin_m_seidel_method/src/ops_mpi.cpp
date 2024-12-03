@@ -150,9 +150,6 @@ bool kharin_m_seidel_method::GaussSeidelParallel::pre_processing() {
     // Чтение вектора b
     auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
     std::copy(b_data, b_data + n, b.begin());
-
-    // Инициализация x
-    std::fill(x.begin(), x.end(), 1.0);
   }
   return true;
 }
