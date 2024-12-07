@@ -49,7 +49,7 @@ bool RadixSortSequential::post_processing() {
   return true;
 }
 
-void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
+static void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
   size_t n_ = data_.size();
   std::vector<uint64_t> keys(n_);
   for (size_t i = 0; i < n_; ++i) {
@@ -77,7 +77,7 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
   }
 }
 
-void RadixSortSequential::radix_sort_uint64(std::vector<uint64_t>& keys) {
+static void RadixSortSequential::radix_sort_uint64(std::vector<uint64_t>& keys) {
   const int BITS = 64;
   const int RADIX = 256;
   std::vector<uint64_t> temp(keys.size());
@@ -230,7 +230,7 @@ bool RadixSortParallel::post_processing() {
   return true;
 }
 
-void RadixSortParallel::radix_sort_doubles(std::vector<double>& data_) {
+static void RadixSortParallel::radix_sort_doubles(std::vector<double>& data_) {
   size_t n_ = data_.size();
   std::vector<uint64_t> keys(n_);
   for (size_t i = 0; i < n_; ++i) {
@@ -257,7 +257,7 @@ void RadixSortParallel::radix_sort_doubles(std::vector<double>& data_) {
   }
 }
 
-void RadixSortParallel::radix_sort_uint64(std::vector<uint64_t>& keys) {
+static void RadixSortParallel::radix_sort_uint64(std::vector<uint64_t>& keys) {
   const int BITS = 64;
   const int RADIX = 256;
   std::vector<uint64_t> temp(keys.size());
