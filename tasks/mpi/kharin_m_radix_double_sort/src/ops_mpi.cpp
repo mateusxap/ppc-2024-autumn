@@ -278,32 +278,3 @@ void RadixSortParallel::radix_sort_uint64(std::vector<uint64_t>& keys) {
     keys.swap(temp);
   }
 }
-
-std::vector<double> RadixSortParallel::merge_sorted_subarrays(
-    const std::vector<std::vector<double>>& sorted_subarrays) const {
-  typedef std::pair<double, std::pair<int, int>> HeapNode;
-  std::priority_queue<HeapNode, std::vector<HeapNode>, std::greater<>> min_heap;
-
-  // Инициализация кучи
-  for (int i = 0; i < (int)sorted_subarrays.size(); ++i) {
-    if (!sorted_subarrays[i].empty()) {
-      min_heap.push({sorted_subarrays[i][0], {i, 0}});
-    }
-  }
-
-  std::vector<double> result;
-  result.reserve(n);
-  while (!min_heap.empty()) {
-    auto node = min_heap.top();
-    min_heap.pop();
-    double value = node.first;
-    int array_idx = node.second.first;
-    int elem_idx = node.second.second;
-    result.push_back(value);
-    if (elem_idx + 1 < (int)sorted_subarrays[array_idx].size()) {
-      min_heap.push({sorted_subarrays[array_idx][elem_idx + 1], {array_idx, elem_idx + 1}});
-    }
-  }
-
-  return result;
-}

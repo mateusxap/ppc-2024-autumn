@@ -48,9 +48,6 @@ class RadixSortParallel : public ppc::core::Task {
 
   static void radix_sort_doubles(std::vector<double>& data);
   static void radix_sort_uint64(std::vector<uint64_t>& keys);
-
-  // Функция для простого слияния отсортированных подмассивов
-  std::vector<double> merge_sorted_subarrays(const std::vector<std::vector<double>>& sorted_subarrays) const;
 };
 
 }  // namespace kharin_m_radix_double_sort
