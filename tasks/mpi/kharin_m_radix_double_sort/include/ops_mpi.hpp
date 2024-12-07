@@ -28,14 +28,14 @@ class RadixSortSequential : public ppc::core::Task {
   std::vector<double> data;
   int n = 0;
 
-  void radix_sort_doubles(std::vector<double>& data);
-  void radix_sort_uint64(std::vector<uint64_t>& keys);
+  static void radix_sort_doubles(std::vector<double>& data);
+  static void radix_sort_uint64(std::vector<uint64_t>& keys);
 };
 
 // Класс для параллельной поразрядной сортировки double
 class RadixSortParallel : public ppc::core::Task {
  public:
-  explicit RadixSortParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)), world() {}
+  explicit RadixSortParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
   bool pre_processing() override;
   bool validation() override;
   bool run() override;
@@ -46,11 +46,11 @@ class RadixSortParallel : public ppc::core::Task {
   int n = 0;
   boost::mpi::communicator world;
 
-  void radix_sort_doubles(std::vector<double>& data);
-  void radix_sort_uint64(std::vector<uint64_t>& keys);
+  static void radix_sort_doubles(std::vector<double>& data);
+  static void radix_sort_uint64(std::vector<uint64_t>& keys);
 
   // Функция для простого слияния отсортированных подмассивов
-  std::vector<double> merge_sorted_subarrays(const std::vector<std::vector<double>>& sorted_subarrays);
+  std::vector<double> merge_sorted_subarrays(const std::vector<std::vector<double>>& sorted_subarrays) const;
 };
 
 }  // namespace kharin_m_radix_double_sort

@@ -56,7 +56,7 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
     uint64_t u;
     std::memcpy(&u, &data_[i], sizeof(double));
     // Перевод для сохранения порядка
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
       u |= 0x8000000000000000ULL;
@@ -68,7 +68,7 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
 
   for (size_t i = 0; i < n_; ++i) {
     uint64_t u = keys[i];
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u &= ~0x8000000000000000ULL;
     } else {
       u = ~u;
@@ -137,7 +137,8 @@ bool RadixSortParallel::run() {
   int local_n = n / size;
   int remainder = n % size;
 
-  std::vector<int> counts(size), displs(size);
+  std::vector<int> counts(size);
+  std::vector<int> displs(size);
   if (rank == 0) {
     for (int i = 0; i < size; ++i) {
       counts[i] = local_n + (i < remainder ? 1 : 0);
@@ -235,7 +236,7 @@ void RadixSortParallel::radix_sort_doubles(std::vector<double>& data_) {
   for (size_t i = 0; i < n_; ++i) {
     uint64_t u;
     std::memcpy(&u, &data_[i], sizeof(double));
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
       u |= 0x8000000000000000ULL;
@@ -247,7 +248,7 @@ void RadixSortParallel::radix_sort_doubles(std::vector<double>& data_) {
 
   for (size_t i = 0; i < n_; ++i) {
     uint64_t u = keys[i];
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u &= ~0x8000000000000000ULL;
     } else {
       u = ~u;
@@ -279,7 +280,7 @@ void RadixSortParallel::radix_sort_uint64(std::vector<uint64_t>& keys) {
 }
 
 std::vector<double> RadixSortParallel::merge_sorted_subarrays(
-    const std::vector<std::vector<double>>& sorted_subarrays) {
+    const std::vector<std::vector<double>>& sorted_subarrays) const{
   typedef std::pair<double, std::pair<int, int>> HeapNode;
   std::priority_queue<HeapNode, std::vector<HeapNode>, std::greater<>> min_heap;
 

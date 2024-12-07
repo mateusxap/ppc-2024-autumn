@@ -54,7 +54,7 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
     uint64_t u;
     std::memcpy(&u, &data_[i], sizeof(double));
     // Перевод для сохранения порядка
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u = ~u;
     } else {
       u |= 0x8000000000000000ULL;
@@ -66,7 +66,7 @@ void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
 
   for (size_t i = 0; i < n_; ++i) {
     uint64_t u = keys[i];
-    if (u & 0x8000000000000000ULL) {
+    if ((u & 0x8000000000000000ULL) != 0) {
       u &= ~0x8000000000000000ULL;
     } else {
       u = ~u;
