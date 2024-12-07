@@ -25,8 +25,8 @@ class RadixSortSequential : public ppc::core::Task {
   std::vector<double> data;
   int n = 0;
 
-  static void radix_sort_doubles(std::vector<double>& data);
-  static void radix_sort_uint64(std::vector<uint64_t>& keys);
+  void radix_sort_doubles(std::vector<double>& data);
+  void radix_sort_uint64(std::vector<uint64_t>& keys);
 };
 
 }  // namespace kharin_m_radix_double_sort

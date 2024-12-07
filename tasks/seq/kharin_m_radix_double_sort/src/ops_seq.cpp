@@ -47,7 +47,7 @@ bool RadixSortSequential::post_processing() {
   return true;
 }
 
-static void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
+void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) {
   size_t n_ = data_.size();
   std::vector<uint64_t> keys(n_);
   for (size_t i = 0; i < n_; ++i) {
@@ -75,7 +75,7 @@ static void RadixSortSequential::radix_sort_doubles(std::vector<double>& data_) 
   }
 }
 
-static void RadixSortSequential::radix_sort_uint64(std::vector<uint64_t>& keys) {
+void RadixSortSequential::radix_sort_uint64(std::vector<uint64_t>& keys) {
   const int BITS = 64;
   const int RADIX = 256;
   std::vector<uint64_t> temp(keys.size());
