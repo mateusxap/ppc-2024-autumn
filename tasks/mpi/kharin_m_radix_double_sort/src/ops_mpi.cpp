@@ -280,7 +280,7 @@ void RadixSortParallel::radix_sort_uint64(std::vector<uint64_t>& keys) {
 }
 
 std::vector<double> RadixSortParallel::merge_sorted_subarrays(
-    const std::vector<std::vector<double>>& sorted_subarrays) const{
+    const std::vector<std::vector<double>>& sorted_subarrays) const {
   typedef std::pair<double, std::pair<int, int>> HeapNode;
   std::priority_queue<HeapNode, std::vector<HeapNode>, std::greater<>> min_heap;
 
