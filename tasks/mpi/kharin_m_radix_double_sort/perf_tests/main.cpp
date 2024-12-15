@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <boost/mpi.hpp>
 #include <boost/mpi/timer.hpp>
-#include <cmath>
 #include <random>
 #include <vector>
 
@@ -14,7 +13,7 @@ namespace mpi = boost::mpi;
 using namespace kharin_m_radix_double_sort;
 
 // Тест производительности с использованием pipeline_run
-TEST(RadixSort_MPI_PerfTest, test_pipeline_run) {
+TEST(kharin_m_radix_double_sort_mpi_perf, test_pipeline_run) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -75,7 +74,7 @@ TEST(RadixSort_MPI_PerfTest, test_pipeline_run) {
 }
 
 // Тест производительности с использованием task_run
-TEST(RadixSort_MPI_PerfTest, test_task_run) {
+TEST(kharin_m_radix_double_sort_mpi_perf, test_task_run) {
   mpi::environment env;
   mpi::communicator world;
 

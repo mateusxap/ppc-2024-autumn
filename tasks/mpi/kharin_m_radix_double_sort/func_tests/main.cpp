@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <boost/mpi.hpp>
-#include <cmath>
 #include <random>
 #include <vector>
 
@@ -12,7 +11,7 @@ namespace mpi = boost::mpi;
 using namespace kharin_m_radix_double_sort;
 
 // Тест на корректность параллельной и последовательной поразрядной сортировки на простом наборе данных
-TEST(RadixSort_MPI, SimpleData) {
+TEST(kharin_m_radix_double_sort_mpi, SimpleData) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -66,7 +65,7 @@ TEST(RadixSort_MPI, SimpleData) {
 }
 
 // Тест на некорректные входные данные (меньше данных, чем заявлено)
-TEST(RadixSort_MPI, ValidationFailureTestSize) {
+TEST(kharin_m_radix_double_sort_mpi, ValidationFailureTestSize) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -93,7 +92,7 @@ TEST(RadixSort_MPI, ValidationFailureTestSize) {
 }
 
 // Дополнительный тест: сортировка случайных double (малый размер)
-TEST(RadixSort_MPI, RandomDataSmall) {
+TEST(kharin_m_radix_double_sort_mpi, RandomDataSmall) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -155,7 +154,7 @@ TEST(RadixSort_MPI, RandomDataSmall) {
 }
 
 // Дополнительный тест: сортировка большого массива случайных double
-TEST(RadixSort_MPI, RandomDataLarge) {
+TEST(kharin_m_radix_double_sort_mpi, RandomDataLarge) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -219,7 +218,7 @@ TEST(RadixSort_MPI, RandomDataLarge) {
 }
 
 // Дополнительный тест: уже отсортированный массив
-TEST(RadixSort_MPI, AlreadySortedData) {
+TEST(kharin_m_radix_double_sort_mpi, AlreadySortedData) {
   mpi::environment env;
   mpi::communicator world;
 
@@ -275,7 +274,7 @@ TEST(RadixSort_MPI, AlreadySortedData) {
 }
 
 // Дополнительный тест: массив в обратном порядке
-TEST(RadixSort_MPI, ReverseSortedData) {
+TEST(kharin_m_radix_double_sort_mpi, ReverseSortedData) {
   mpi::environment env;
   mpi::communicator world;
 

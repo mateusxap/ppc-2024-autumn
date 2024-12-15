@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <random>
 #include <vector>
 
@@ -11,7 +10,7 @@
 
 using kharin_m_radix_double_sort::RadixSortSequential;
 
-TEST(RadixSort_Sequential_PerfTest, test_pipeline_run) {
+TEST(kharin_m_radix_double_sort_seq_perf, test_pipeline_run) {
   // Выберем достаточно большой размер для тестирования производительности
   int N = 10000000;
   std::vector<double> inputData(N);
@@ -71,7 +70,7 @@ TEST(RadixSort_Sequential_PerfTest, test_pipeline_run) {
   }
 }
 
-TEST(RadixSort_Sequential_PerfTest, test_task_run) {
+TEST(kharin_m_radix_double_sort_seq_perf, test_task_run) {
   // Аналогичный тест, но с task_run
   int N = 1000000;
   std::vector<double> inputData(N);

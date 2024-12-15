@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <cmath>
 #include <random>
 #include <vector>
 
@@ -10,7 +9,7 @@
 using namespace kharin_m_radix_double_sort;
 
 // Тест на корректность параллельной и последовательной поразрядной сортировки на простом наборе данных
-TEST(RadixSort_MPI, SimpleData) {
+TEST(kharin_m_radix_double_sort_seq, SimpleData) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
   int N = 8;
@@ -43,7 +42,7 @@ TEST(RadixSort_MPI, SimpleData) {
 }
 
 // Тест на некорректные входные данные (меньше данных, чем заявлено)
-TEST(RadixSort_MPI, ValidationFailureTestSize) {
+TEST(kharin_m_radix_double_sort_seq, ValidationFailureTestSize) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
   int N = 5;
@@ -65,7 +64,7 @@ TEST(RadixSort_MPI, ValidationFailureTestSize) {
 }
 
 // Дополнительный тест: сортировка случайных double (малый размер)
-TEST(RadixSort_MPI, RandomDataSmall) {
+TEST(kharin_m_radix_double_sort_seq, RandomDataSmall) {
   // Генерируем небольшой случайный массив double
   int N = 20;
   std::vector<double> inputData(N);
@@ -105,7 +104,7 @@ TEST(RadixSort_MPI, RandomDataSmall) {
 }
 
 // Дополнительный тест: сортировка большого массива случайных double
-TEST(RadixSort_MPI, RandomDataLarge) {
+TEST(kharin_m_radix_double_sort_seq, RandomDataLarge) {
   // Генерируем небольшой случайный массив double
   int N = 10000;
   std::vector<double> inputData(N);
@@ -145,7 +144,7 @@ TEST(RadixSort_MPI, RandomDataLarge) {
 }
 
 // Дополнительный тест: уже отсортированный массив
-TEST(RadixSort_MPI, AlreadySortedData) {
+TEST(kharin_m_radix_double_sort_seq, AlreadySortedData) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
   int N = 10;
@@ -178,7 +177,7 @@ TEST(RadixSort_MPI, AlreadySortedData) {
 }
 
 // Дополнительный тест: массив в обратном порядке
-TEST(RadixSort_MPI, ReverseSortedData) {
+TEST(kharin_m_radix_double_sort_seq, ReverseSortedData) {
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
 
   int N = 10;
