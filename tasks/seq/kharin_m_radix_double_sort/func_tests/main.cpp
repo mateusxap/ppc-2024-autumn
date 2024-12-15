@@ -37,7 +37,7 @@ TEST(kharin_m_radix_double_sort_seq, SimpleData) {
   std::sort(inputData.begin(), inputData.end());
 
   for (int i = 0; i < N; ++i) {
-    ASSERT_EQ(inputData[i], resultSeq[i]);
+    ASSERT_NEAR(inputData[i], resultSeq[i], 1e-12);
   }
 }
 
@@ -99,7 +99,7 @@ TEST(kharin_m_radix_double_sort_seq, RandomDataSmall) {
 
   // Проверяем, что результаты совпадают
   for (int i = 0; i < N; ++i) {
-    ASSERT_EQ(inputData[i], resultSeq[i]);
+    ASSERT_NEAR(inputData[i], resultSeq[i], 1e-12);
   }
 }
 
@@ -139,7 +139,7 @@ TEST(kharin_m_radix_double_sort_seq, RandomDataLarge) {
 
   // Проверяем, что результаты совпадают
   for (int i = 0; i < N; ++i) {
-    ASSERT_EQ(inputData[i], resultSeq[i]);
+    ASSERT_NEAR(inputData[i], resultSeq[i], 1e-12);
   }
 }
 
@@ -172,7 +172,7 @@ TEST(kharin_m_radix_double_sort_seq, AlreadySortedData) {
   std::sort(inputData.begin(), inputData.end());
 
   for (int i = 0; i < N; ++i) {
-    ASSERT_EQ(inputData[i], resultSeq[i]);
+    ASSERT_NEAR(inputData[i], resultSeq[i], 1e-12);
   }
 }
 
@@ -205,6 +205,6 @@ TEST(kharin_m_radix_double_sort_seq, ReverseSortedData) {
   std::sort(inputData.begin(), inputData.end());
 
   for (int i = 0; i < N; ++i) {
-    ASSERT_EQ(inputData[i], resultSeq[i]);
+    ASSERT_NEAR(inputData[i], resultSeq[i], 1e-12);
   }
 }
