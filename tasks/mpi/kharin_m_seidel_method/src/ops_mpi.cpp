@@ -132,7 +132,7 @@ bool kharin_m_seidel_method::GaussSeidelSequential::post_processing() {
   // Запись результатов в taskData->outputs[0]
   auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
   for (int i = 0; i < n; i++) {
-    x[i] = x_output[i];  // копирование по элементам
+    x_output[i] = x[i];  // копирование по элементам
   }
   return true;
 }
@@ -306,7 +306,7 @@ bool kharin_m_seidel_method::GaussSeidelParallel::post_processing() {
     // Запись результатов в taskData->outputs[0]
     auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
     for (int i = 0; i < n; i++) {
-      x[i] = x_output[i];  // копирование по элементам
+      x_output[i] = x[i];  // копирование по элементам
     }
   }
 
