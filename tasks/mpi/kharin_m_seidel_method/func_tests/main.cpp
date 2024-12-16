@@ -97,7 +97,6 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
   int N = 4;
   double eps = 1e-6;
 
-  // Матрица меньшего размера
   std::vector<double> A = {4, 1, 2, 3, 5, 1, 1, 1, 3};
   std::vector<double> b = {15, 15, 10};
 
