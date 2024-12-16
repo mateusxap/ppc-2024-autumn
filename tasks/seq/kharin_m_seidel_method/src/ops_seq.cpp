@@ -16,11 +16,15 @@ bool kharin_m_seidel_method::GaussSeidelSequential::pre_processing() {
 
   // Чтение матрицы A из taskData->inputs[2]
   auto* a_data = reinterpret_cast<double*>(taskData->inputs[2]);
-  std::copy(a_data, a_data + n * n, a.begin());
+  for (unsigned i = 0; i < n * n; i++) {
+    a[i] = a_data[i];  // копирование по элементам
+  }
 
   // Чтение вектора b из taskData->inputs[3]
   auto* b_data = reinterpret_cast<double*>(taskData->inputs[3]);
-  std::copy(b_data, b_data + n, b.begin());
+  for (unsigned i = 0; i < n; i++) {
+    b[i] = b_data[i];  // копирование по элементам
+  }
 
   return true;
 }
@@ -124,6 +128,8 @@ bool kharin_m_seidel_method::GaussSeidelSequential::post_processing() {
 
   // Запись результатов в taskData->outputs[0]
   auto* x_output = reinterpret_cast<double*>(taskData->outputs[0]);
-  std::copy(x.begin(), x.end(), x_output);
+  for (unsigned i = 0; i < n; i++) {
+    x[i] = x_output[i];  // копирование по элементам
+  }
   return true;
 }
