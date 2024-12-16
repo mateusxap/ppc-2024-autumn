@@ -48,7 +48,6 @@ TEST(kharin_m_radix_double_sort_mpi_perf, test_pipeline_run) {
     taskDataPar->outputs_count.emplace_back(N);
   }
 
-  // Инициализируем параллельную задачу
   auto radixSortPar = std::make_shared<RadixSortParallel>(taskDataPar);
   ASSERT_TRUE(radixSortPar->validation());
   radixSortPar->pre_processing();
