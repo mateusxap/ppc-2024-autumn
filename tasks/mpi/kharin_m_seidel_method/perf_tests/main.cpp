@@ -1,4 +1,3 @@
-// gauss_seidel_mpi_perf_test.cpp
 #include <gtest/gtest.h>
 
 #include <boost/mpi/timer.hpp>

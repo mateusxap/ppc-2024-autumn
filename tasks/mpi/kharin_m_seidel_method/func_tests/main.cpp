@@ -1,4 +1,3 @@
-// gauss_seidel_mpi_test.cpp
 #include <gtest/gtest.h>
 
 #include <algorithm>

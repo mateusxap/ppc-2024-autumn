@@ -1,4 +1,3 @@
-// ops_mpi.cpp
 #include "mpi/kharin_m_seidel_method/include/ops_mpi.hpp"
 
 #include <boost/mpi.hpp>

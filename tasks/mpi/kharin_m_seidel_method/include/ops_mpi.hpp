@@ -1,4 +1,3 @@
-// ops_mpi.hpp
 #pragma once
 
 #include <gtest/gtest.h>
