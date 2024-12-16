@@ -15,7 +15,6 @@
 
 namespace kharin_m_radix_double_sort {
 
-// Класс для последовательной поразрядной сортировки double
 class RadixSortSequential : public ppc::core::Task {
  public:
   explicit RadixSortSequential(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
@@ -32,7 +31,6 @@ class RadixSortSequential : public ppc::core::Task {
   static void radix_sort_uint64(std::vector<uint64_t>& keys);
 };
 
-// Класс для параллельной поразрядной сортировки double
 class RadixSortParallel : public ppc::core::Task {
  public:
   explicit RadixSortParallel(std::shared_ptr<ppc::core::TaskData> taskData_) : Task(std::move(taskData_)) {}
