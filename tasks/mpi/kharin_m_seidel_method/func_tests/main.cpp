@@ -505,7 +505,7 @@ TEST(GaussSeidel_MPI, ValidationFailureEmptyMatrix) {
   int N = 0;
   double eps = 1e-6;
 
-  std::vector<double> A; // Пустая матрица
+  std::vector<double> A;  // Пустая матрица
   std::vector<double> b;
 
   std::vector<double> xPar(0, 0.0);
@@ -519,10 +519,10 @@ TEST(GaussSeidel_MPI, ValidationFailureEmptyMatrix) {
     taskDataPar->inputs_count.emplace_back(1);
 
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataPar->inputs_count.emplace_back(0); // Размер 0
+    taskDataPar->inputs_count.emplace_back(0);  // Размер 0
 
     taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
-    taskDataPar->inputs_count.emplace_back(0); // Размер 0
+    taskDataPar->inputs_count.emplace_back(0);  // Размер 0
 
     // Настройка выходных данных для параллельной версии
     taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
