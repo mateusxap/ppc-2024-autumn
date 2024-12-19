@@ -93,6 +93,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
   mpi::communicator world;
 
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   int N = 4;
   double eps = 1e-6;
@@ -101,6 +102,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
   std::vector<double> b = {15, 15, 10};
 
   if (world.rank() == 0) {
+    // Настройка данных для последовательной версии
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
     taskDataSeq->inputs_count.emplace_back(1);
 
@@ -115,13 +117,27 @@ TEST(GaussSeidel_MPI, ValidationFailureTestMatrixSize) {
     taskDataSeq->inputs_count.emplace_back(3);
 
     std::vector<double> xSeq(N, 0.0);
-
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
+    // Копируем данные для параллельной версии
+    taskDataPar->inputs = taskDataSeq->inputs;
+    taskDataPar->inputs_count = taskDataSeq->inputs_count;
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка последовательной версии
+  if (world.rank() == 0) {
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
   }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
 }
 
 // Тест 3: Матрица не диагонально доминантная
@@ -130,6 +146,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
   mpi::communicator world;
 
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   int N = 4;
   double eps = 1e-6;
@@ -139,6 +156,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
   std::vector<double> b = {15, 15, 10, 10};
 
   if (world.rank() == 0) {
+    // Настройка данных для последовательной версии
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
     taskDataSeq->inputs_count.emplace_back(1);
 
@@ -155,9 +173,24 @@ TEST(GaussSeidel_MPI, ValidationFailureTestNonDiagonallyDominant) {
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
+    // Копируем данные для параллельной версии
+    taskDataPar->inputs = taskDataSeq->inputs;
+    taskDataPar->inputs_count = taskDataSeq->inputs_count;
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка последовательной версии
+  if (world.rank() == 0) {
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
   }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
 }
 
 // Тест 4: Неправильное количество выходных данных
@@ -166,6 +199,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
   mpi::communicator world;
 
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   int N = 4;
   double eps = 1e-6;
@@ -174,6 +208,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
   std::vector<double> b = {15, 15, 10, 10};
 
   if (world.rank() == 0) {
+    // Настройка данных для последовательной версии
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
     taskDataSeq->inputs_count.emplace_back(1);
 
@@ -181,21 +216,34 @@ TEST(GaussSeidel_MPI, ValidationFailureTestOutputCount) {
     taskDataSeq->inputs_count.emplace_back(1);
 
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataSeq->inputs_count.emplace_back(N * N);
+    // Намеренно указываем неправильный размер
+    taskDataSeq->inputs_count.emplace_back(3 * 3);
 
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
-    taskDataSeq->inputs_count.emplace_back(N);
+    taskDataSeq->inputs_count.emplace_back(3);
 
-    std::vector<double> xSeq1(N, 0.0);
-    std::vector<double> xSeq2(N, 0.0);
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq1.data()));
-    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq2.data()));
-    taskDataSeq->outputs_count.emplace_back(N);
+    std::vector<double> xSeq(N, 0.0);
+    taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
+    // Копируем данные для параллельной версии
+    taskDataPar->inputs = taskDataSeq->inputs;
+    taskDataPar->inputs_count = taskDataSeq->inputs_count;
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка последовательной версии
+  if (world.rank() == 0) {
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
   }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
 }
 
 // Тест 5: Случайная диагонально доминантная матрица
@@ -320,6 +368,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
   mpi::communicator world;
 
   std::shared_ptr<ppc::core::TaskData> taskDataSeq = std::make_shared<ppc::core::TaskData>();
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
 
   int N = 4;
   double eps = 1e-6;
@@ -329,6 +378,7 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
   std::vector<double> b = {15, 15, 10, 10};
 
   if (world.rank() == 0) {
+    // Настройка данных для последовательной версии
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
     taskDataSeq->inputs_count.emplace_back(1);
 
@@ -336,16 +386,150 @@ TEST(GaussSeidel_MPI, ValidationFailureTestZerosDiagonally) {
     taskDataSeq->inputs_count.emplace_back(1);
 
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
-    taskDataSeq->inputs_count.emplace_back(N * N);
+    // Намеренно указываем неправильный размер
+    taskDataSeq->inputs_count.emplace_back(3 * 3);
 
     taskDataSeq->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
-    taskDataSeq->inputs_count.emplace_back(N);
+    taskDataSeq->inputs_count.emplace_back(3);
 
     std::vector<double> xSeq(N, 0.0);
     taskDataSeq->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
     taskDataSeq->outputs_count.emplace_back(N);
 
+    // Копируем данные для параллельной версии
+    taskDataPar->inputs = taskDataSeq->inputs;
+    taskDataPar->inputs_count = taskDataSeq->inputs_count;
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xSeq.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка последовательной версии
+  if (world.rank() == 0) {
     GaussSeidelSequential gaussSeidelSeq(taskDataSeq);
     ASSERT_FALSE(gaussSeidelSeq.validation());
   }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
+}
+
+// Тест 7: Валидация параллельной версии с корректными данными
+TEST(GaussSeidel_MPI, ParallelValidationWithCorrectData) {
+  mpi::environment env;
+  mpi::communicator world;
+
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  int N = 3;
+  double eps = 1e-6;
+
+  // Диагонально доминантная матрица
+  std::vector<double> A = {4, 1, 1, 2, 5, 1, 1, 1, 3};
+  std::vector<double> b = {6, 14, 8};
+  std::vector<double> xPar(N, 0.0);
+
+  if (world.rank() == 0) {
+    // Настройка данных для параллельной версии
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&eps));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+    taskDataPar->inputs_count.emplace_back(N * N);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataPar->inputs_count.emplace_back(N);
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_TRUE(gaussSeidelPar.validation());
+}
+
+// Тест 8: Валидация параллельной версии с некорректными данными (недостаточный ранг)
+TEST(GaussSeidel_MPI, ParallelValidationFailureInsufficientRank) {
+  mpi::environment env;
+  mpi::communicator world;
+
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  int N = 3;
+  double eps = 1e-6;
+
+  // Матрица с недостаточным рангом
+  std::vector<double> A = {2, 4, 2, 4, 8, 4, 1, 2, 1};
+  std::vector<double> b = {4, 8, 2};
+
+  std::vector<double> xPar(N, 0.0);
+
+  if (world.rank() == 0) {
+    // Настройка данных для параллельной версии
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&eps));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+    taskDataPar->inputs_count.emplace_back(N * N);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataPar->inputs_count.emplace_back(N);
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
+    taskDataPar->outputs_count.emplace_back(N);
+  }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
+}
+
+// Тест 9: Валидация параллельной версии с пустой матрицей
+TEST(GaussSeidel_MPI, ValidationFailureEmptyMatrix) {
+  mpi::environment env;
+  mpi::communicator world;
+
+  std::shared_ptr<ppc::core::TaskData> taskDataPar = std::make_shared<ppc::core::TaskData>();
+
+  int N = 0;
+  double eps = 1e-6;
+
+  std::vector<double> A; // Пустая матрица
+  std::vector<double> b;
+
+  std::vector<double> xPar(0, 0.0);
+
+  if (world.rank() == 0) {
+    // Настройка данных для параллельной версии
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&N));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(&eps));
+    taskDataPar->inputs_count.emplace_back(1);
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(A.data()));
+    taskDataPar->inputs_count.emplace_back(0); // Размер 0
+
+    taskDataPar->inputs.emplace_back(reinterpret_cast<uint8_t*>(b.data()));
+    taskDataPar->inputs_count.emplace_back(0); // Размер 0
+
+    // Настройка выходных данных для параллельной версии
+    taskDataPar->outputs.emplace_back(reinterpret_cast<uint8_t*>(xPar.data()));
+    taskDataPar->outputs_count.emplace_back(0);
+  }
+
+  // Проверка параллельной версии
+  GaussSeidelParallel gaussSeidelPar(taskDataPar);
+  ASSERT_FALSE(gaussSeidelPar.validation());
 }
